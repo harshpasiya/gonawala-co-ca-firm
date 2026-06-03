@@ -32,10 +32,9 @@ const processSteps = [
 ]
 
 function StepCard({ step, index, scrollYProgress }: { step: typeof processSteps[0]; index: number; scrollYProgress: any }) {
-  // Each step gets its own scroll progress window
-  // Stagger the steps so they appear one after another
-  const stepStart = index * 0.25
-  const stepEnd = stepStart + 0.35
+  // Staggered scroll offsets for overlay effect
+  const stepStart = 0.1 + index * 0.22
+  const stepEnd = stepStart + 0.25
 
   const stepProgress = useTransform(
     scrollYProgress,
@@ -47,19 +46,23 @@ function StepCard({ step, index, scrollYProgress }: { step: typeof processSteps[
   // For the last step, keep it visible - don't fade out
   const isLastStep = index === processSteps.length - 1
   
+  // Overlay fade: fade in, stay visible, then fade out (except last step)
   const opacity = isLastStep 
-    ? useTransform(stepProgress, [0, 0.2], [0, 1], { clamp: true })
-    : useTransform(stepProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0], { clamp: true })
+    ? useTransform(stepProgress, [0, 0.15], [0, 1], { clamp: true })
+    : useTransform(stepProgress, [0, 0.2, 0.75, 1], [0, 1, 1, 0], { clamp: true })
 
-  const yPos = useTransform(stepProgress, [0, 0.5, 1], [80, 0, 0], { clamp: true })
+  // Scale down slightly as it fades out
+  const scale = isLastStep
+    ? useTransform(stepProgress, [0, 0.15], [0.95, 1], { clamp: true })
+    : useTransform(stepProgress, [0, 0.2, 0.75, 1], [0.95, 1, 1, 0.95], { clamp: true })
 
   return (
     <motion.div
       style={{
         opacity,
-        y: yPos,
+        scale,
       }}
-      className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center min-h-screen flex items-center"
+      className="absolute inset-0 grid grid-cols-1 md:grid-cols-2 gap-12 items-center h-screen"
     >
       {/* Left side - Checkpoint and Text */}
       <div className="space-y-6">
@@ -112,7 +115,7 @@ export function ProcessNewSection() {
     <section ref={containerRef} className="relative bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="h-screen flex items-center">
+        <div className="h-[50vh] flex items-center md:h-[60vh]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -125,8 +128,8 @@ export function ProcessNewSection() {
           </motion.div>
         </div>
 
-        {/* Process Steps */}
-        <div className="relative">
+        {/* Process Steps - Stacked Overlay */}
+        <div className="relative h-[400vh]">
           {processSteps.map((step, index) => (
             <StepCard key={index} step={step} index={index} scrollYProgress={scrollYProgress} />
           ))}
