@@ -28,39 +28,41 @@ const steps = [
 
 export function ProcessSection() {
   return (
-    <section className="py-20 bg-background">
+    <section className="py-24 bg-background border-y border-foreground/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="mb-20"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Our Process</h2>
-          <p className="text-xl text-foreground/70 max-w-2xl mx-auto">
-            A systematic approach to deliver exceptional results
-          </p>
+          <span className="text-sm uppercase tracking-widest text-foreground/60 block mb-4">Our Process</span>
+          <h2 className="text-5xl md:text-6xl font-bold text-foreground">
+            Clear financial processes, steady documentation, and informed reporting
+          </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="relative"
+              className="relative flex flex-col"
             >
-              <div className="bg-card rounded-xl p-6 border border-border h-full">
-                <div className="text-5xl font-bold text-primary/20 mb-4">{step.number}</div>
-                <h3 className="text-xl font-bold text-foreground mb-2">{step.title}</h3>
-                <p className="text-foreground/70 text-sm leading-relaxed">{step.description}</p>
+              <div className="flex items-start gap-4 mb-6">
+                <div className="text-5xl font-bold text-foreground/10">{step.number}</div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-foreground mb-2">{step.title}</h3>
+                </div>
               </div>
+              <p className="text-foreground/70 text-base leading-relaxed flex-1">{step.description}</p>
 
               {/* Arrow between steps */}
               {index < steps.length - 1 && (
-                <div className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10">
-                  <ChevronRight className="text-primary" size={24} />
+                <div className="hidden lg:flex absolute -right-12 top-8 z-10">
+                  <ChevronRight className="text-foreground/20" size={24} />
                 </div>
               )}
             </motion.div>

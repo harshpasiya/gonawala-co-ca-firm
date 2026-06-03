@@ -35,49 +35,49 @@ export function TestimonialsSection() {
   const [activeIndex, setActiveIndex] = useState(0)
 
   return (
-    <section className="py-20 bg-card">
+    <section className="py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="mb-20"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Client Testimonials</h2>
-          <p className="text-xl text-foreground/70 max-w-2xl mx-auto">
-            Hear from our satisfied clients about their experience
-          </p>
+          <span className="text-sm uppercase tracking-widest text-foreground/60 block mb-4">Client Testimonials</span>
+          <h2 className="text-5xl md:text-6xl font-bold text-foreground">
+            Trusted by ambitious businesses
+          </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               onClick={() => setActiveIndex(index)}
-              className={`p-8 rounded-xl border-2 transition-all cursor-pointer ${
+              className={`p-8 rounded-lg border transition-all cursor-pointer ${
                 activeIndex === index
-                  ? 'border-primary bg-background'
-                  : 'border-border bg-background/50'
+                  ? 'border-foreground/30 bg-foreground/5'
+                  : 'border-foreground/10 bg-transparent hover:border-foreground/20'
               }`}
             >
-              <div className="flex gap-1 mb-4">
+              <div className="flex gap-1 mb-6">
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <Star
                     key={i}
-                    size={18}
-                    className="fill-primary text-primary"
+                    size={16}
+                    className="fill-foreground text-foreground"
                   />
                 ))}
               </div>
-              <p className="text-foreground mb-6 leading-relaxed italic">
+              <p className="text-foreground mb-6 leading-relaxed text-lg">
                 {`"${testimonial.content}"`}
               </p>
-              <div>
-                <p className="font-bold text-foreground">{testimonial.name}</p>
-                <p className="text-foreground/70 text-sm">{testimonial.role}</p>
+              <div className="pt-4 border-t border-foreground/10">
+                <p className="font-semibold text-foreground">{testimonial.name}</p>
+                <p className="text-foreground/60 text-sm">{testimonial.role}</p>
               </div>
             </motion.div>
           ))}

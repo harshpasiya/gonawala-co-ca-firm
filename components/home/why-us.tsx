@@ -28,40 +28,36 @@ const features = [
 
 export function WhyUsSection() {
   return (
-    <section className="py-20 bg-gradient-to-b from-card to-background">
+    <section className="py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Why Choose Us</h2>
-          <p className="text-xl text-foreground/70 max-w-2xl mx-auto">
-            We stand out with our commitment to excellence and client satisfaction
-          </p>
+          <span className="text-sm uppercase tracking-widest text-foreground/60 block mb-4">Why Trust Us</span>
+          <h2 className="text-5xl md:text-6xl font-bold text-foreground">
+            Your financial success is our priority
+          </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex gap-6"
+                className="border-l border-foreground/20 pl-6"
               >
-                <div className="flex-shrink-0">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                    <Icon className="text-primary" size={24} />
-                  </div>
+                <div className="mb-4">
+                  <Icon className="text-foreground" size={32} />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">{feature.title}</h3>
-                  <p className="text-foreground/70">{feature.description}</p>
-                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-2">{feature.title}</h3>
+                <p className="text-foreground/70 text-lg leading-relaxed">{feature.description}</p>
               </motion.div>
             )
           })}
