@@ -4,12 +4,21 @@ import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
 
 export function HeroSection() {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end start'],
+  })
+  const y = useTransform(scrollYProgress, [0, 1], [0, 100])
+
   return (
-    <section className="min-h-screen relative overflow-hidden pt-16 flex items-center bg-background">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0">
+    <section ref={ref} className="min-h-screen relative overflow-hidden pt-16 flex items-center bg-background">
+      {/* Parallax Background Image with Overlay */}
+      <motion.div className="absolute inset-0 z-0" style={{ y }}>
         <Image
           src="/images/hero-bg.png"
           alt="Professional office"
@@ -19,7 +28,7 @@ export function HeroSection() {
         />
         <div className="absolute inset-0 bg-background/80" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-      </div>
+      </motion.div>
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -62,7 +71,7 @@ export function HeroSection() {
             >
               <Link
                 href="/contact"
-                className="px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group w-full sm:w-auto"
+                className="px-8 py-4 bg-foreground text-background rounded-lg font-semibold hover:bg-foreground/90 transition-all flex items-center justify-center gap-2 group w-full sm:w-auto"
               >
                 Explore Services
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />

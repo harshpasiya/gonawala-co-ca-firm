@@ -4,7 +4,10 @@ import { FloatingButtons } from '@/components/floating-buttons'
 import { CookieConsent } from '@/components/cookie-consent'
 import { HeroSection } from '@/components/home/hero'
 import { SocialProofSection } from '@/components/home/social-proof'
+import { FeaturesSection } from '@/components/home/features'
 import { ServicesSection } from '@/components/home/services'
+import { GallerySection } from '@/components/home/gallery'
+import { StatsEnhancedSection } from '@/components/home/stats-enhanced'
 import { WhyUsSection } from '@/components/home/why-us'
 import { ProcessSection } from '@/components/home/process'
 import { TestimonialsSection } from '@/components/home/testimonials'
@@ -17,7 +20,10 @@ export default function Home() {
       <main className="pt-16">
         <HeroSection />
         <SocialProofSection />
+        <FeaturesSection />
         <ServicesSection />
+        <GallerySection />
+        <StatsEnhancedSection />
         <WhyUsSection />
         <ProcessSection />
         <TestimonialsSection />

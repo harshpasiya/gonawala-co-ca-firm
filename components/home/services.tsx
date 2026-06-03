@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
 
 const services = [
   {
@@ -21,6 +23,41 @@ const services = [
     image: '/images/service-3.png',
   },
 ]
+
+function ServiceCard({ service, index }: { service: typeof services[0]; index: number }) {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start center', 'end center'],
+  })
+  const y = useTransform(scrollYProgress, [0, 1], [50, -50])
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      className="group cursor-pointer"
+    >
+      <motion.div style={{ y }} className="relative h-72 mb-6 overflow-hidden rounded-lg">
+        <Image
+          src={service.image}
+          alt={service.title}
+          fill
+          className="object-cover group-hover:scale-110 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-black/80 transition-colors duration-300" />
+        <div className="absolute inset-0 flex items-end p-6">
+          <h3 className="text-2xl font-bold text-white">{service.title}</h3>
+        </div>
+      </motion.div>
+      <div className="space-y-3">
+        <p className="text-foreground/70 leading-relaxed text-lg">{service.description}</p>
+      </div>
+    </motion.div>
+  )
+}
 
 export function ServicesSection() {
   return (
@@ -41,30 +78,10 @@ export function ServicesSection() {
           </p>
         </motion.div>
 
-        {/* Featured Services Grid */}
+        {/* Featured Services Grid with Parallax */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
           {services.map((service, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="group cursor-pointer"
-            >
-              <div className="relative h-64 mb-6 overflow-hidden rounded-lg">
-                <Image
-                  src={service.image}
-                  alt={service.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-foreground mb-3">{service.title}</h3>
-                <p className="text-foreground/70 leading-relaxed">{service.description}</p>
-              </div>
-            </motion.div>
+            <ServiceCard key={index} service={service} index={index} />
           ))}
         </div>
 
