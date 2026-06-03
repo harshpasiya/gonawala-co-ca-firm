@@ -7,7 +7,7 @@ const stats = [
   { value: 500, label: 'Happy Clients', suffix: '+' },
   { value: 15, label: 'Years Experience', suffix: '+' },
   { value: 1000, label: 'Projects Completed', suffix: '+' },
-  { value: 98, label: 'Client Satisfaction', suffix: '%' },
+  { value: 99, label: 'Client Satisfaction', suffix: '%' },
 ]
 
 function CountUpNumber({ value, duration = 2 }: { value: number; duration?: number }) {

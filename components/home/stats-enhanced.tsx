@@ -21,7 +21,7 @@ const stats = [
     label: 'Financial Portfolios Managed',
   },
   {
-    value: 98,
+    value: 141,
     suffix: '%',
     label: 'Client Satisfaction Rate',
   },
