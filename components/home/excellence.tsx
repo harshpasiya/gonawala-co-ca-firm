@@ -27,9 +27,9 @@ export function ExcellenceSection() {
             playsInline
             className="w-full h-full object-cover"
           >
-            <source src="https://videos.pexels.com/video-files/12628247/12628247-sd_640_360_30fps.mp4" type="video/mp4" />
+            <source src="/videos/expert.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-black/50" />
         </div>
 
         {/* Content */}

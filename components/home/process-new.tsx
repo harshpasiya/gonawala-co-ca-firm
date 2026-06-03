@@ -3,7 +3,6 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import Image from 'next/image'
-import { Check } from 'lucide-react'
 
 const processSteps = [
   {
@@ -36,7 +35,7 @@ export function ProcessNewSection() {
   const containerRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start start', 'end end'],
+    offset: ['start start', 'end center'],
   })
 
   return (
@@ -57,11 +56,11 @@ export function ProcessNewSection() {
         </div>
 
         {/* Process Steps */}
-        <div className="relative py-12">
+        <div className="relative">
           {processSteps.map((step, index) => {
             // Create staggered scroll offset for each step
-            const startOffset = (index / processSteps.length) * 0.7
-            const endOffset = ((index + 1) / processSteps.length) * 0.85
+            const startOffset = (index / processSteps.length) * 0.6
+            const endOffset = ((index + 1) / processSteps.length) * 0.75
 
             const stepScrollProgress = useTransform(
               scrollYProgress,
@@ -70,12 +69,12 @@ export function ProcessNewSection() {
               { clamp: true }
             )
 
-            const opacity = useTransform(stepScrollProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0])
-            const scale = useTransform(stepScrollProgress, [0, 0.2, 0.8, 1], [0.9, 1, 1, 0.9])
-            const yPos = useTransform(stepScrollProgress, [0, 0.5, 1], [100, 0, -100])
+            const opacity = useTransform(stepScrollProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
+            const scale = useTransform(stepScrollProgress, [0, 0.15, 0.85, 1], [0.95, 1, 1, 0.95])
+            const yPos = useTransform(stepScrollProgress, [0, 0.5, 1], [50, 0, -50])
 
             return (
-              <div key={index} className="relative mb-24">
+              <div key={index} className="relative mb-12">
                 <motion.div
                   style={{
                     opacity,
@@ -103,15 +102,6 @@ export function ProcessNewSection() {
                         <p className="text-lg text-foreground/70 leading-relaxed">
                           {step.description}
                         </p>
-                        <motion.div
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 }}
-                          className="mt-6 flex items-center gap-2 text-foreground"
-                        >
-                          <Check size={20} />
-                          <span className="font-semibold">Ready for next step</span>
-                        </motion.div>
                       </div>
                     </div>
                   </div>
@@ -139,18 +129,6 @@ export function ProcessNewSection() {
             )
           })}
         </div>
-
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="py-20 text-center"
-        >
-          <p className="text-xl text-foreground/70 mb-6">
-            Ready to start your financial transformation journey?
-          </p>
-        </motion.div>
       </div>
     </section>
   )

@@ -2,46 +2,49 @@
 
 import { motion } from 'framer-motion'
 import { useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 const stats = [
   {
-    value: '500',
+    value: 500,
     suffix: '+',
     label: 'Happy Clients Worldwide',
   },
   {
-    value: '15',
+    value: 15,
     suffix: '+',
     label: 'Years of Experience',
   },
   {
-    value: '1000',
+    value: 1000,
     suffix: '+',
     label: 'Financial Portfolios Managed',
   },
   {
-    value: '98',
+    value: 98,
     suffix: '%',
     label: 'Client Satisfaction Rate',
   },
 ]
 
-function CountUpNumber({ value }: { value: number | string }) {
+function CountUpNumber({ value }: { value: number }) {
   const ref = useRef(null)
+  const [displayValue, setDisplayValue] = useState(0)
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start 75%', 'start 35%'],
   })
-  const count = useTransform(scrollYProgress, [0, 0.7], [0, Number(value)], {
-    clamp: true,
-  })
+
+  useEffect(() => {
+    return scrollYProgress.onChange((v) => {
+      const newValue = Math.floor(v * 0.7 * value)
+      setDisplayValue(newValue)
+    })
+  }, [scrollYProgress, value])
 
   return (
-    <motion.span ref={ref}>
-      <motion.span suppressHydrationWarning>
-        {Math.floor(count)}
-      </motion.span>
+    <motion.span ref={ref} suppressHydrationWarning>
+      {displayValue}
     </motion.span>
   )
 }
