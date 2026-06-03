@@ -17,19 +17,23 @@ export function ExcellenceSection() {
 
   return (
     <section ref={containerRef} className="relative h-[300vh] bg-background">
-      <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center">
+      <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-black">
         {/* Background Video with Parallax */}
         <div className="absolute inset-0 w-full h-full">
           <video
+            key="excellence-video"
             autoPlay
             muted
             loop
             playsInline
+            preload="auto"
             className="w-full h-full object-cover"
+            crossOrigin="anonymous"
           >
             <source src="/videos/expert.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
           </video>
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/40" />
         </div>
 
         {/* Content */}
