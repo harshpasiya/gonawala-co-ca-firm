@@ -31,14 +31,16 @@ function CountUpNumber({ value }: { value: number | string }) {
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ['start 80%', 'start 20%'],
+    offset: ['start 75%', 'start 35%'],
   })
-  const count = useTransform(scrollYProgress, [0, 1], [0, Number(value)])
+  const count = useTransform(scrollYProgress, [0, 0.7], [0, Number(value)], {
+    clamp: true,
+  })
 
   return (
     <motion.span ref={ref}>
       <motion.span suppressHydrationWarning>
-        {count}
+        {Math.floor(count)}
       </motion.span>
     </motion.span>
   )

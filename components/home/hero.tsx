@@ -27,7 +27,7 @@ export function HeroSection() {
           priority
         />
         <div className="absolute inset-0 bg-background/80" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
       </motion.div>
 
       {/* Content */}

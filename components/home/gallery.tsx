@@ -54,7 +54,7 @@ function GalleryItem({ image, index }: { image: typeof galleryImages[0]; index: 
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       transition={{ delay: index * 0.05 }}
-      className={`${image.span} relative overflow-hidden rounded-lg group cursor-pointer`}
+      className={`${image.span} relative overflow-hidden rounded-2xl group cursor-pointer`}
     >
       <Image
         src={image.src}

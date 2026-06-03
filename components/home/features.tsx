@@ -72,7 +72,7 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
     >
       {isLeft ? (
         <>
-          <motion.div style={{ y }} className="relative h-96 rounded-lg overflow-hidden">
+          <motion.div style={{ y }} className="relative h-96 rounded-2xl overflow-hidden">
             <Image
               src={feature.image}
               alt={feature.title}
@@ -98,7 +98,7 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
               <div className="h-1 w-12 bg-foreground" />
             </div>
           </div>
-          <motion.div style={{ y }} className="relative h-96 rounded-lg overflow-hidden order-1 md:order-2">
+          <motion.div style={{ y }} className="relative h-96 rounded-2xl overflow-hidden order-1 md:order-2">
             <Image
               src={feature.image}
               alt={feature.title}
