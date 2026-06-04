@@ -173,7 +173,7 @@ function ServiceCard({ service, onClick }: { service: typeof allServices[0]; onC
 }
 
 function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onClose }: any) {
-  const [phase, setPhase] = useState<'headingIn' | 'mainTyping' | 'mainFadeOut' | 'subservicesReveal' | 'done'>('headingIn')
+  const [phase, setPhase] = useState<'headingIn' | 'mainTyping' | 'transitionPhase' | 'finalDisplay' | 'done'>('headingIn')
   const [typedMain, setTypedMain] = useState('')
   const [typedSubDescriptions, setTypedSubDescriptions] = useState<Record<number, string>>({})
   const [expandedSubIndex, setExpandedSubIndex] = useState<number | null>(null)
@@ -217,7 +217,7 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
         } else {
           if (mainTyperRef.current) clearInterval(mainTyperRef.current)
           phaseTimerRef.current = setTimeout(() => {
-            setPhase('mainFadeOut')
+            setPhase('transitionPhase')
           }, 1200)
         }
       }, 15)
@@ -227,17 +227,30 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
     }
   }, [phase, serviceData.main])
 
-  // Phase 3: Main fade out (400ms) -> Phase 4
+  // Phase 3: OVERVIEW and Services appear together with staggered animations (1000ms) -> Phase 4
   useEffect(() => {
-    if (phase === 'mainFadeOut') {
+    if (phase === 'transitionPhase') {
       phaseTimerRef.current = setTimeout(() => {
-        setPhase('subservicesReveal')
-      }, 400)
+        setPhase('finalDisplay')
+      }, 1000)
     }
     return () => {
       if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
     }
   }, [phase])
+
+  // Phase 4: Final display with completion (duration of subservices stagger)
+  useEffect(() => {
+    if (phase === 'finalDisplay') {
+      const totalSubServiceDuration = serviceData.subDescriptions.length * 120 + 600
+      phaseTimerRef.current = setTimeout(() => {
+        setPhase('done')
+      }, totalSubServiceDuration)
+    }
+    return () => {
+      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
+    }
+  }, [phase, serviceData.subDescriptions.length])
 
   // Handle subservice expand/collapse with typewriter
   const handleSubServiceClick = (idx: number) => {
@@ -277,7 +290,7 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
 
   const handleSkip = () => {
     resetAll()
-    setPhase('subservicesReveal')
+    setPhase('finalDisplay')
     setTypedMain(serviceData.main)
     setExpandedSubIndex(null)
     setTypedSubDescriptions({})
@@ -289,8 +302,8 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
     }
   }, [service.id])
 
-  const totalDuration = (serviceData.subDescriptions.length * 1500) + 4000
-  const progress = phase === 'subservicesReveal' || phase === 'done' ? 100 : phase === 'mainFadeOut' ? 60 : phase === 'mainTyping' ? 40 : 20
+  // Progress calculation: only reaches 100% at the end after all animations
+  const progress = phase === 'done' ? 100 : phase === 'finalDisplay' ? 90 : phase === 'transitionPhase' ? 70 : phase === 'mainTyping' ? 40 : 20
 
   return (
     <motion.div
@@ -361,14 +374,14 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
             transition={{ duration: 0.3 }}
             className="overflow-y-auto p-5 md:p-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border"
           >
-            {/* OVERVIEW Section - Fades out after typing */}
+            {/* OVERVIEW Section - Shows during mainTyping, fades out during transitionPhase */}
             <AnimatePresence>
-              {(phase === 'mainTyping' || phase === 'mainFadeOut') && (
+              {(phase === 'mainTyping' || phase === 'transitionPhase') && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: phase === 'mainFadeOut' ? 0 : 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: phase === 'mainFadeOut' ? 0.4 : 0.3 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: phase === 'transitionPhase' ? 0 : 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: phase === 'transitionPhase' ? 0.6 : 0.3 }}
                   className="mb-6"
                 >
                   <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
@@ -380,14 +393,14 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
               )}
             </AnimatePresence>
 
-            {/* Services Breakdown - Shows after phase 3 */}
+            {/* Services Breakdown - Appears during transitionPhase and finalDisplay with favorable animations */}
             <AnimatePresence>
-              {phase === 'subservicesReveal' && (
+              {(phase === 'transitionPhase' || phase === 'finalDisplay' || phase === 'done') && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.6, type: 'spring', stiffness: 60, damping: 20 }}
                 >
                   <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">
                     Services Included ({serviceData.subDescriptions.length})
@@ -397,9 +410,15 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
                     {serviceData.subDescriptions.map((desc, idx) => (
                       <motion.div
                         key={idx}
-                        initial={{ y: 10, opacity: 0 }}
+                        initial={{ y: 12, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: idx * 0.12, duration: 0.3 }}
+                        transition={{ 
+                          delay: idx * 0.12, 
+                          duration: 0.35,
+                          type: 'spring',
+                          stiffness: 100,
+                          damping: 15
+                        }}
                       >
                         <motion.button
                           onClick={() => handleSubServiceClick(idx)}
@@ -408,7 +427,7 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
                             backgroundColor: expandedSubIndex === idx ? 'var(--card)' : 'transparent',
                             border: expandedSubIndex === idx ? '1px solid var(--border)' : '1px solid var(--border)',
                           }}
-                          whileHover={{ backgroundColor: 'var(--card)' }}
+                          whileHover={{ backgroundColor: 'var(--card)', scale: 1.02 }}
                         >
                           <div className="flex-shrink-0 w-6 h-6 rounded-full bg-foreground/10 text-foreground flex items-center justify-center text-xs font-semibold">
                             {idx + 1}
@@ -448,13 +467,19 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
 
                   {/* CTA Button */}
                   <motion.div
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: serviceData.subDescriptions.length * 0.12 + 0.3, duration: 0.4 }}
+                    initial={{ y: 15, opacity: 0, scale: 0.95 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    transition={{ 
+                      delay: serviceData.subDescriptions.length * 0.12 + 0.4, 
+                      duration: 0.5,
+                      type: 'spring',
+                      stiffness: 80,
+                      damping: 18
+                    }}
                   >
                     <Link
                       href="/contact"
-                      className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all"
+                      className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all hover:shadow-lg"
                     >
                       Get This Service
                     </Link>
