@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer className="bg-background border-t border-foreground/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           {/* Company Info */}
           <div>
             <h3 className="font-bold text-xl mb-4 text-foreground">Gonawala & Co.</h3>
@@ -31,10 +31,25 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-6 text-foreground text-sm uppercase tracking-widest">Services</h4>
             <ul className="space-y-3 text-sm">
-              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Tax Planning</Link></li>
-              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Auditing</Link></li>
-              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Payroll</Link></li>
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Accounting & Bookkeeping</Link></li>
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Auditing & Assurance</Link></li>
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Taxation Services</Link></li>
               <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">GST Compliance</Link></li>
+            </ul>
+          </div>
+
+          {/* Services 2 */}
+          <div>
+            <h4 className="font-semibold mb-6 text-foreground text-sm uppercase tracking-widest">More Services</h4>
+            <ul className="space-y-3 text-sm">
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Corporate & Company Law</Link></li>
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Financial Advisory</Link></li>
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Loan & Fund Raising</Link></li>
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">FEMA & Int'l Taxation</Link></li>
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Insolvency & Bankruptcy</Link></li>
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Startup & Business Advisory</Link></li>
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Payroll & Labour Law</Link></li>
+              <li><Link href="/services" className="text-foreground/70 hover:text-foreground transition-colors">Certification Services</Link></li>
             </ul>
           </div>
 

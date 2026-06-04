@@ -2,88 +2,126 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { FileText, Calculator, Users, TrendingUp, BarChart3, PieChart, DollarSign, ShieldCheck, Zap, Shield, Eye, Lightbulb } from 'lucide-react'
-import Link from 'next/link'
+import { FileText, Calculator, Users, TrendingUp, BarChart3, PieChart, DollarSign, ShieldCheck, Zap, Shield, Eye, Lightbulb, Globe, Briefcase, ListCheck, Laptop } from 'lucide-react'
 
 const allServices = [
   {
-    category: 'Tax Services',
-    icon: FileText,
-    services: [
-      'Income Tax Planning & Filing',
-      'Corporate Tax Strategy',
-      'Tax Compliance & Audit',
-      'Tax Optimization',
-    ],
-  },
-  {
-    category: 'Compliance',
-    icon: ShieldCheck,
-    services: [
-      'GST Filing & Compliance',
-      'TDS Compliance',
-      'Annual Compliance',
-      'Regulatory Compliance',
-    ],
-  },
-  {
-    category: 'Audit & Assurance',
-    icon: BarChart3,
-    services: [
-      'Internal Audit',
-      'External Audit',
-      'Financial Statements',
-      'Audit Reporting',
-    ],
-  },
-  {
-    category: 'Payroll & HR',
-    icon: Users,
-    services: [
-      'Payroll Processing',
-      'Employee Compliance',
-      'Statutory Reporting',
-      'HR Advisory',
-    ],
-  },
-  {
-    category: 'Financial Advisory',
-    icon: TrendingUp,
-    services: [
-      'Financial Planning',
-      'Business Strategy',
-      'Growth Strategy',
-      'Cost Optimization',
-    ],
-  },
-  {
-    category: 'Investment Advisory',
-    icon: PieChart,
-    services: [
-      'Portfolio Management',
-      'Investment Planning',
-      'Risk Assessment',
-      'Wealth Management',
-    ],
-  },
-  {
-    category: 'Business Advisory',
-    icon: Lightbulb,
-    services: [
-      'Business Valuation',
-      'M&A Advisory',
-      'Due Diligence',
-      'Business Restructuring',
-    ],
-  },
-  {
-    category: 'Accounting Services',
+    category: 'Accounting & Bookkeeping',
     icon: Calculator,
     services: [
-      'Bookkeeping',
-      'Monthly Accounting',
-      'Financial Statements',
-      'Accounting Systems',
+      'Maintaining books of accounts',
+      'Preparation of financial statements (Balance Sheet, P&L, Cash Flow)',
+      'Management accounting and MIS reports',
+    ],
+  },
+  {
+    category: 'Auditing & Assurance',
+    icon: BarChart3,
+    services: [
+      'Statutory Audit – mandatory audit under Companies Act',
+      'Tax Audit – u/s 44AB of Income Tax Act',
+      'Internal Audit, Bank Audit, Forensic Audit, Cost Audit',
+      'Stock Audit – physical verification of inventory',
+    ],
+  },
+  {
+    category: 'Taxation Services',
+    icon: FileText,
+    services: [
+      'Income Tax return filing (individuals, firms, companies)',
+      'Tax planning and advisory',
+      'TDS/TCS compliance and return filing',
+      'Advance tax computation and appeal filing',
+    ],
+  },
+  {
+    category: 'GST (Goods & Services Tax)',
+    icon: ShieldCheck,
+    services: [
+      'GST registration',
+      'Monthly/quarterly GST return filing (GSTR-1, GSTR-3B)',
+      'GST audit and reconciliation',
+      'GST refund claims and advisory',
+    ],
+  },
+  {
+    category: 'Corporate & Company Law Services',
+    icon: Briefcase,
+    services: [
+      'Company incorporation (Pvt Ltd, LLP, OPC)',
+      'ROC (Registrar of Companies) compliances',
+      'Filing of annual returns and forms with MCA',
+      'Drafting of MOA, AOA, board resolutions',
+    ],
+  },
+  {
+    category: 'Financial Advisory & Planning',
+    icon: TrendingUp,
+    services: [
+      'Personal financial planning',
+      'Investment advisory',
+      'Business valuation',
+      'Project finance and feasibility reports',
+    ],
+  },
+  {
+    category: 'Loan & Fund Raising',
+    icon: DollarSign,
+    services: [
+      'Preparation of CMA (Credit Monitoring Arrangement) data',
+      'Project reports for bank loans',
+      'Working capital finance assistance',
+      'Liaison with banks and financial institutions',
+    ],
+  },
+  {
+    category: 'FEMA & International Taxation',
+    icon: Globe,
+    services: [
+      'Foreign Exchange Management Act (FEMA) compliance',
+      'Advising on NRI taxation',
+      'Transfer pricing documentation and compliance',
+      'Double Taxation Avoidance Agreement (DTAA) advisory',
+    ],
+  },
+  {
+    category: 'Insolvency & Bankruptcy (IBC)',
+    icon: Shield,
+    services: [
+      'Acting as Insolvency Professional (IP)',
+      'Advisory under IBC 2016',
+      'Resolution and liquidation proceedings',
+      'Financial restructuring and recovery',
+    ],
+  },
+  {
+    category: 'Startup & Business Advisory',
+    icon: Lightbulb,
+    services: [
+      'Business registration and structure advisory',
+      'Startup India registration',
+      'MSME registration',
+      'Drafting of partnership deeds and shareholder agreements',
+    ],
+  },
+  {
+    category: 'Payroll & Labour Law Compliance',
+    icon: Users,
+    services: [
+      'Salary structuring and payroll processing',
+      'PF, ESIC, and Professional Tax compliance',
+      'Labour law advisory',
+      'Statutory reporting and filings',
+    ],
+  },
+  {
+    category: 'Certification Services',
+    icon: ListCheck,
+    services: [
+      'Net worth certificates',
+      'Income certificates for visa and loan purposes',
+      'Turnover certificates',
+      'Form 15CB (remittance certification)',
     ],
   },
 ]
@@ -113,7 +151,7 @@ export default function ServicesContent() {
       {/* Services Grid */}
       <section className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {allServices.map((service, index) => {
               const Icon = service.icon
               return (
