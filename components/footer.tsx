@@ -10,7 +10,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           {/* Company Info */}
           <div>
-            <h3 className="font-bold text-xl mb-4 text-foreground">Elite CA</h3>
+            <h3 className="font-bold text-xl mb-4 text-foreground">Gonawala & Co.</h3>
             <p className="text-foreground/70 text-sm leading-relaxed">
               Expert chartered accountant services delivering financial excellence through tax planning, auditing, and strategic advisory.
             </p>
@@ -64,7 +64,7 @@ export function Footer() {
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-sm text-foreground/60">
-            © 2024 Elite CA Services. All rights reserved.
+            © 2024 Gonawala & Co. CA Services. All rights reserved.
           </p>
 
           {/* Social Links */}

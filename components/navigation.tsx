@@ -38,7 +38,7 @@ export function Navigation() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
-            <span className="text-2xl font-bold text-foreground tracking-tight">Elite CA</span>
+            <span className="text-2xl font-bold text-foreground tracking-tight">Gonawala & Co.</span>
           </Link>
 
           {/* Desktop Navigation */}
