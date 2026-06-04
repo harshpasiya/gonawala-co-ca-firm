@@ -5,6 +5,82 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 
+// Service data with 3-4 sentence main descriptions and subservice details
+const mainServiceDescriptions: Record<number, { main: string; subDescriptions: string[] }> = {
+  1: { 
+    main: "Accurate financial records are the foundation of every successful business. We maintain complete books of accounts including ledgers, journals, and subsidiary records in compliance with applicable accounting standards. Our team prepares financial statements — Balance Sheet, Profit & Loss Account, and Cash Flow Statement — that give you a clear picture of your financial health. We also provide management accounting and MIS reports tailored to your decision-making needs.",
+    subDescriptions: ['Maintaining comprehensive books of accounts with ledger management', 'Preparation of financial statements including Balance Sheet, P&L, and Cash Flow', 'Management accounting reports and MIS for strategic decisions']
+  },
+  2: { 
+    main: "An independent audit provides credibility to your financial statements and builds trust with stakeholders, investors, and regulators. We conduct statutory audits under the Companies Act, tax audits under Section 44AB of the Income Tax Act, and internal audits that strengthen your internal control systems. Our forensic audit services help detect and investigate financial fraud, while our bank audits cover concurrent, stock, and branch audit assignments. Every audit engagement is conducted with objectivity, professional skepticism, and strict adherence to auditing standards.",
+    subDescriptions: ['Statutory Audit under the Companies Act 2013', 'Tax Audit under Section 44AB of the Income Tax Act', 'Internal Audit for control systems strengthening', 'Forensic Audit and fraud investigation']
+  },
+  3: { 
+    main: "Navigating India's complex tax landscape requires both deep technical knowledge and strategic foresight. We handle income tax return filing for individuals, partnership firms, LLPs, and companies while ensuring full compliance with the latest provisions. Our tax planning advisory helps you legally minimize your tax liability through careful structuring of income, investments, and business transactions. We also represent clients before tax authorities for assessments, scrutiny proceedings, and appeals before CIT(A) and ITAT.",
+    subDescriptions: ['Income Tax return filing for all entities', 'Tax planning and advisory for liability optimization', 'TDS and TCS compliance management', 'Representation in tax assessments and appeals']
+  },
+  4: { 
+    main: "Since its introduction in 2017, GST has fundamentally transformed indirect taxation in India and non-compliance carries significant financial and legal consequences. We manage end-to-end GST compliance including registration, monthly and quarterly return filing (GSTR-1, GSTR-3B, GSTR-9), and annual GST audit and reconciliation. Our team advises on GST applicability, rate classification, input tax credit optimization, and handles GST refund claims for exporters and inverted duty structure cases. We also represent clients in GST audits, scrutiny notices, and departmental proceedings.",
+    subDescriptions: ['GST registration and ongoing compliance management', 'Monthly and quarterly return filing (GSTR-1, GSTR-3B, GSTR-9)', 'GST audit and annual reconciliation', 'GST refund claims and representation']
+  },
+  5: { 
+    main: "Incorporating and operating a company in India involves ongoing compliance obligations that require expert guidance to navigate without penalties. We assist with the incorporation of Private Limited Companies, LLPs, One Person Companies, and Section 8 Companies, including preparation of MOA, AOA, and all MCA filings. Post-incorporation, we handle all ROC compliance including annual returns, board meeting documentation, statutory registers, and event-based filings under the Companies Act 2013. Our secretarial services ensure your company maintains full legal standing at all times.",
+    subDescriptions: ['Company incorporation (Pvt Ltd, LLP, OPC) with full documentation', 'Ongoing ROC compliance and filing management', 'Annual returns and statutory register maintenance', 'MOA, AOA drafting and board resolutions']
+  },
+  6: { 
+    main: "Sound financial planning is the difference between reactive decision-making and confident long-term growth. We provide personalized financial planning for individuals covering investments, insurance, retirement, and wealth structuring, as well as corporate financial advisory covering capital allocation, business valuation, and M&A support. Our project finance services include preparation of detailed feasibility reports and CMA data for bank financing, while our budgeting and forecasting work helps management track performance against financial targets. We help you align financial strategy with your business objectives.",
+    subDescriptions: ['Personal financial planning and wealth management', 'Investment advisory and portfolio optimization', 'Business valuation and M&A advisory', 'Project finance and feasibility studies']
+  },
+  7: { 
+    main: "Accessing the right financing at the right time is critical for business growth and working capital stability. We prepare comprehensive project reports and CMA (Credit Monitoring Arrangement) data that meet the detailed requirements of scheduled banks and NBFCs. Our team structures working capital facilities, term loans, and project finance proposals to maximize your chances of approval at competitive rates. We also liaise directly with bank officials and financial institutions on your behalf throughout the loan process.",
+    subDescriptions: ['CMA data preparation to banking standards', 'Project reports for institutional lending', 'Working capital finance structuring', 'Bank liaison and loan negotiation']
+  },
+  8: { 
+    main: "The Insolvency and Bankruptcy Code 2016 introduced a time-bound resolution mechanism that has transformed how financial distress is handled in India. We provide advisory services to corporate debtors, financial creditors, and operational creditors on their rights and obligations under the IBC framework. Our registered Insolvency Professionals can act as Interim Resolution Professionals or Resolution Professionals in Corporate Insolvency Resolution Processes (CIRP). We also advise on pre-packaged insolvency resolutions and voluntary liquidation proceedings for companies and LLPs.",
+    subDescriptions: ['Advisory to debtors and creditors under IBC', 'Acting as Insolvency and Resolution Professional', 'Corporate restructuring and recovery proceedings', 'Voluntary liquidation and exit planning']
+  },
+  9: { 
+    main: "Starting and scaling a business in India requires careful structuring, timely registrations, and strategic advisory at every stage. We advise founders on choosing the right business structure — private limited company, LLP, or partnership — based on their funding, liability, and tax goals. Our team handles Startup India recognition, MSME (Udyam) registration, DPIIT filings, and assists with drafting shareholder agreements, founders' agreements, and investor term sheets. We also conduct due diligence for mergers, acquisitions, and investment transactions.",
+    subDescriptions: ['Business structure advisory and entity formation', 'Startup India and MSME registration', 'Shareholder and founders agreements', 'M&A due diligence and transaction support']
+  },
+  10: { 
+    main: "Managing payroll accurately and staying compliant with India's labour laws is a complex, ongoing responsibility for every employer. We handle complete payroll processing including salary structuring, payslip generation, and full-and-final settlement calculations in a tax-efficient manner. Our compliance services cover monthly PF and ESIC filings, professional tax registration and payments, and labour welfare fund contributions across states. We also advise on compliance with the new Labour Codes and help employers align their HR policies with applicable statutory requirements.",
+    subDescriptions: ['Salary structuring and payroll processing', 'PF, ESIC and Professional Tax compliance', 'Labour law advisory and policy alignment', 'Statutory reporting and state compliance']
+  },
+  11: { 
+    main: "A wide range of official transactions — visa applications, bank loans, tenders, and legal proceedings — require certificates issued by a practicing Chartered Accountant. We issue net worth certificates, income certificates, turnover certificates, and solvency certificates that are accepted by embassies, banks, and courts across India. Our Form 15CB certification services facilitate outward remittances in compliance with Section 195 of the Income Tax Act, with proper characterization of payments and applicable DTAA provisions. We also provide project-specific certificates required by government departments, SEBI, and regulatory bodies.",
+    subDescriptions: ['Net worth and solvency certificates', 'Income certificates for visa and loan applications', 'Turnover and business certificates', 'Form 15CB for remittance certification']
+  },
+  12: { 
+    main: "Non-Resident Indians have unique tax obligations in India that arise from property income, capital gains, interest, dividends, and business income sourced from Indian territory. We determine your residential status under both the Income Tax Act and FEMA, which is the critical first step in understanding your Indian tax liability. Our team files NRI income tax returns, claims applicable deductions and exemptions, and advises on leveraging Double Taxation Avoidance Agreements (DTAA) to eliminate double taxation on the same income. We also advise on TDS implications for buyers of NRI property and assist NRIs in obtaining lower deduction certificates.",
+    subDescriptions: ['Residential status determination for NRI taxation', 'Income Tax return filing for non-residents', 'DTAA benefits and double taxation avoidance', 'TDS optimization and lower deduction certificates']
+  },
+  13: { 
+    main: "The Foreign Exchange Management Act governs all cross-border financial transactions by Indian residents and non-residents, and violations attract serious civil penalties. We advise individuals and businesses on the permissibility of specific foreign exchange transactions under the current account and capital account regulations. Our services include structuring fund repatriation from India, advising on NRE, NRO, and FCNR account operations, and filing compounding applications for past FEMA contraventions. We also prepare and file Annual Performance Reports and other FEMA compliance filings required by the RBI.",
+    subDescriptions: ['FEMA transaction advisory and compliance', 'Foreign investment and fund repatriation structuring', 'NRE, NRO, FCNR account operations', 'FEMA filing and return submission']
+  },
+  14: { 
+    main: "Every foreign direct investment into India and every outbound investment by an Indian entity triggers specific RBI reporting obligations that must be met within strict timelines. We handle FC-GPR and FC-TRS filings for inbound FDI transactions, Form ODI filings for overseas direct investments by Indian companies, and Form ECB filings for external commercial borrowings. Our team also prepares and files the Annual Return on Foreign Liabilities and Assets (FLA Return) which is mandatory for all companies that have received FDI or made ODI. Non-compliance with these filings attracts penalties under FEMA and can complicate future foreign transactions.",
+    subDescriptions: ['FDI (Foreign Direct Investment) filings', 'ODI (Overseas Direct Investment) forms', 'ECB (External Commercial Borrowings)', 'Annual return on Foreign Liabilities and Assets']
+  },
+  15: { 
+    main: "Transfer pricing regulations require that all international transactions between related parties be conducted at arm's length prices, failing which significant tax adjustments and penalties apply. We prepare comprehensive transfer pricing documentation including the Master File, Local File, and the mandatory Form 3CEB report that must be filed with the income tax return. Our economists and tax professionals determine the most appropriate transfer pricing method and benchmark transactions against comparable uncontrolled data. We also represent clients in transfer pricing assessments before the TPO and in appeals before the DRP and ITAT.",
+    subDescriptions: ['Transfer Pricing documentation and Master File', 'Form 3CEB compliance and filing', 'Arm\'s Length Price determination and benchmarking', 'TP assessment defense and ITAT appeals']
+  },
+  16: { 
+    main: "As Indian businesses expand globally and foreign companies invest in India, cross-border transactions create complex tax challenges that require specialized expertise. We advise on the tax-efficient structuring of outbound and inbound transactions, taking into account India's tax treaties with over 90 countries under the DTAA network. Our permanent establishment risk analysis helps multinational enterprises avoid inadvertently creating taxable presence in India or abroad. We also handle Form 15CA and 15CB certifications for all outward remittances and advise on BEPS-related compliance including Country-by-Country Reporting.",
+    subDescriptions: ['Cross-border transaction structuring', 'DTAA advisory and treaty benefits', 'PE risk analysis for MNEs', 'Form 15CA/15CB and BEPS compliance']
+  },
+  17: { 
+    main: "Indian residents holding foreign assets — bank accounts, immovable property, equity investments, or beneficial interests — must disclose them in Schedule FA of their income tax return every year without exception. Failure to disclose foreign assets attracts penalties of Rs. 10 lakhs per year per asset under the Black Money (Undisclosed Foreign Income and Assets) and Imposition of Tax Act 2015. We assist clients in correctly identifying reportable foreign assets, computing their value as per prescribed rules, and ensuring accurate Schedule FA disclosure in the ITR. We also advise on voluntary disclosure options and compliance strategies for clients with previously undisclosed foreign assets.",
+    subDescriptions: ['Schedule FA (Foreign Assets) disclosure', 'Foreign bank account and property reporting', 'Black Money Act compliance', 'Voluntary disclosure and amnesty schemes']
+  },
+  18: { 
+    main: "Structuring foreign investments correctly from the outset avoids costly restructuring later and ensures regulatory compliance across multiple jurisdictions. For inbound investments into India, we advise on sectoral FDI caps, eligible entry routes (automatic vs government approval), valuation requirements, and post-investment compliance obligations. For outbound investments by Indian companies and individuals, we structure overseas direct investments, advise on ODI limits and conditions, and assist in setting up wholly-owned subsidiaries, joint ventures, and liaison or project offices abroad. Our end-to-end advisory covers tax, FEMA, and corporate law dimensions of every cross-border investment decision.",
+    subDescriptions: ['Inbound investment structuring and FDI routing', 'Outbound investment planning and ODI advisory', 'Setting up subsidiaries and joint ventures', 'Cross-border transaction and tax planning']
+  }
+}
+
 // Service data with updated descriptions (2-line versions)
 const allServices = [
   { id: 1, title: 'Accounting & Bookkeeping', description: 'Complete books of accounts, financial statements, and MIS reports. Ensuring accurate records for informed business decisions.', category: 'Core', subServices: ['Maintaining books of accounts', 'Preparation of financial statements (Balance Sheet, P&L, Cash Flow)', 'Management accounting and MIS reports'] },
@@ -97,98 +173,124 @@ function ServiceCard({ service, onClick }: { service: typeof allServices[0]; onC
 }
 
 function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onClose }: any) {
+  const [phase, setPhase] = useState<'headingIn' | 'mainTyping' | 'mainFadeOut' | 'subservicesReveal' | 'done'>('headingIn')
   const [typedMain, setTypedMain] = useState('')
-  const [typedSubs, setTypedSubs] = useState<string[]>([])
-  const [showCTA, setShowCTA] = useState(false)
-  const [activeSubIndex, setActiveSubIndex] = useState(-1)
-  const [completed, setCompleted] = useState(false)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
-  const subTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const rightPanelRef = useRef<HTMLDivElement>(null)
+  const [typedSubDescriptions, setTypedSubDescriptions] = useState<Record<number, string>>({})
+  const [expandedSubIndex, setExpandedSubIndex] = useState<number | null>(null)
+  
+  // Timer refs for all intervals and timeouts
+  const mainTyperRef = useRef<NodeJS.Timeout | null>(null)
+  const subDescTyperRef = useRef<NodeJS.Timeout | null>(null)
+  const phaseTimerRef = useRef<NodeJS.Timeout | null>(null)
+  
+  const serviceData = mainServiceDescriptions[service.id] || { main: service.description, subDescriptions: service.subServices }
 
-  const cleanupTimers = () => {
-    if (timerRef.current) clearTimeout(timerRef.current)
-    if (subTimerRef.current) clearInterval(subTimerRef.current)
-  }
-
-  const startAnimation = () => {
-    cleanupTimers()
+  const resetAll = () => {
+    if (mainTyperRef.current) clearInterval(mainTyperRef.current)
+    if (subDescTyperRef.current) clearInterval(subDescTyperRef.current)
+    if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
+    setPhase('headingIn')
     setTypedMain('')
-    setTypedSubs([])
-    setShowCTA(false)
-    setActiveSubIndex(-1)
-    setCompleted(false)
-
-    // Type main description
-    let mainIdx = 0
-    timerRef.current = setInterval(() => {
-      if (mainIdx < service.description.length) {
-        setTypedMain(service.description.slice(0, ++mainIdx))
-      } else {
-        if (timerRef.current) clearInterval(timerRef.current)
-        // After main done, start subservices
-        typeSubservices()
-      }
-    }, 15)
+    setTypedSubDescriptions({})
+    setExpandedSubIndex(null)
   }
 
-  const typeSubservices = () => {
-    let subIdx = 0
-    const initialSubs: string[] = []
-
-    const typeNextSub = () => {
-      if (subIdx < service.subServices.length) {
-        setActiveSubIndex(subIdx)
-        const sub = service.subServices[subIdx]
-        let charIdx = 0
-        initialSubs.push('')
-        setTypedSubs([...initialSubs])
-
-        subTimerRef.current = setInterval(() => {
-          if (charIdx < sub.length) {
-            initialSubs[subIdx] = sub.slice(0, ++charIdx)
-            setTypedSubs([...initialSubs])
-          } else {
-            if (subTimerRef.current) clearInterval(subTimerRef.current)
-            subIdx++
-            setTimeout(() => {
-              setTypedSubs(prev => {
-                const updated = [...prev]
-                if (updated[subIdx - 1] !== undefined) {
-                  updated[subIdx - 1] = service.subServices[subIdx - 1]
-                }
-                return updated
-              })
-              typeNextSub()
-            }, 1000)
-          }
-        }, 15)
-      } else {
-        setActiveSubIndex(-1)
-        setShowCTA(true)
-        setCompleted(true)
-      }
+  // Phase 1: Heading animation (500ms) -> Phase 2
+  useEffect(() => {
+    if (phase === 'headingIn') {
+      phaseTimerRef.current = setTimeout(() => {
+        setPhase('mainTyping')
+      }, 500)
     }
+    return () => {
+      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
+    }
+  }, [phase])
 
-    typeNextSub()
+  // Phase 2: Main description typewriter (15ms per char) -> wait 1200ms -> Phase 3
+  useEffect(() => {
+    if (phase === 'mainTyping') {
+      let charIdx = 0
+      mainTyperRef.current = setInterval(() => {
+        if (charIdx < serviceData.main.length) {
+          setTypedMain(serviceData.main.slice(0, ++charIdx))
+        } else {
+          if (mainTyperRef.current) clearInterval(mainTyperRef.current)
+          phaseTimerRef.current = setTimeout(() => {
+            setPhase('mainFadeOut')
+          }, 1200)
+        }
+      }, 15)
+    }
+    return () => {
+      if (mainTyperRef.current) clearInterval(mainTyperRef.current)
+    }
+  }, [phase, serviceData.main])
+
+  // Phase 3: Main fade out (400ms) -> Phase 4
+  useEffect(() => {
+    if (phase === 'mainFadeOut') {
+      phaseTimerRef.current = setTimeout(() => {
+        setPhase('subservicesReveal')
+      }, 400)
+    }
+    return () => {
+      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
+    }
+  }, [phase])
+
+  // Handle subservice expand/collapse with typewriter
+  const handleSubServiceClick = (idx: number) => {
+    if (expandedSubIndex === idx) {
+      setExpandedSubIndex(null)
+      setTypedSubDescriptions(prev => {
+        const updated = { ...prev }
+        delete updated[idx]
+        return updated
+      })
+      if (subDescTyperRef.current) clearInterval(subDescTyperRef.current)
+    } else {
+      setExpandedSubIndex(idx)
+      setTypedSubDescriptions(prev => {
+        const updated = { ...prev }
+        updated[idx] = ''
+        return updated
+      })
+      
+      // Type out the description
+      const desc = serviceData.subDescriptions[idx] || ''
+      let charIdx = 0
+      if (subDescTyperRef.current) clearInterval(subDescTyperRef.current)
+      
+      subDescTyperRef.current = setInterval(() => {
+        if (charIdx < desc.length) {
+          setTypedSubDescriptions(prev => ({
+            ...prev,
+            [idx]: desc.slice(0, ++charIdx)
+          }))
+        } else {
+          if (subDescTyperRef.current) clearInterval(subDescTyperRef.current)
+        }
+      }, 14)
+    }
+  }
+
+  const handleSkip = () => {
+    resetAll()
+    setPhase('subservicesReveal')
+    setTypedMain(serviceData.main)
+    setExpandedSubIndex(null)
+    setTypedSubDescriptions({})
   }
 
   useEffect(() => {
-    startAnimation()
-    return cleanupTimers
+    return () => {
+      resetAll()
+    }
   }, [service.id])
 
-  const handleSkip = () => {
-    cleanupTimers()
-    setTypedMain(service.description)
-    setTypedSubs(service.subServices)
-    setActiveSubIndex(-1)
-    setShowCTA(true)
-    setCompleted(true)
-  }
-
-  const totalDuration = (service.subServices.length * 1500) + 3000
-  const progress = completed ? 100 : (typedMain.length / service.description.length * 30) + (typedSubs.length / service.subServices.length * 70)
+  const totalDuration = (serviceData.subDescriptions.length * 1500) + 4000
+  const progress = phase === 'subservicesReveal' || phase === 'done' ? 100 : phase === 'mainFadeOut' ? 60 : phase === 'mainTyping' ? 40 : 20
 
   return (
     <motion.div
@@ -221,10 +323,14 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
             animate={{ x: 0, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 100, damping: 18 }}
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">{service.title}</h2>
-            <p className="text-xs md:text-sm text-muted-foreground mt-1">{service.category}</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground font-poppins">{service.title}</h2>
+            <div className="flex items-center gap-2 mt-2">
+              <p className="text-xs md:text-sm text-muted-foreground">{service.category}</p>
+              <div className="w-px h-4 bg-border" />
+              <p className="text-xs text-muted-foreground">{serviceData.subDescriptions.length} services included</p>
+            </div>
           </motion.div>
-          <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded transition-colors flex-shrink-0">
             <X size={20} className="text-foreground/60" />
           </button>
         </div>
@@ -250,76 +356,128 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
 
           {/* Right Panel - Content */}
           <motion.div
-            ref={rightPanelRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
             className="overflow-y-auto p-5 md:p-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border"
           >
-            {/* Overview Section */}
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="mb-6">
-              <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
-              <p className="text-sm md:text-base text-foreground/80 leading-relaxed">
-                {typedMain}
-                {typedMain.length < service.description.length && <span className="animate-pulse">|</span>}
-              </p>
-            </motion.div>
-
-            {/* Divider */}
-            <motion.div
-              className="h-px bg-border mb-6"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.3, duration: 0.5, transformOrigin: 'left' }}
-            />
-
-            {/* Services Breakdown */}
-            {typedSubs.length > 0 && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6">
-                <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">Services Breakdown ({service.subServices.length} services)</p>
-                <div className="space-y-3">
-                  {service.subServices.map((sub, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ y: 8, opacity: 0 }}
-                      animate={{ y: 0, opacity: idx < typedSubs.length ? 1 : 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex gap-3"
-                      style={{ opacity: idx < activeSubIndex ? 0.6 : 1 }}
-                    >
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-semibold">
-                        {idx + 1}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-foreground">{typedSubs[idx] || ''}{idx === activeSubIndex && <span className="animate-pulse">|</span>}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {/* CTA Button */}
-            {showCTA && (
-              <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mt-8">
-                <Link
-                  href="/contact"
-                  className="inline-block px-6 py-3 bg-foreground text-background rounded-xl text-sm font-semibold hover:bg-foreground/90 transition-all"
+            {/* OVERVIEW Section - Fades out after typing */}
+            <AnimatePresence>
+              {(phase === 'mainTyping' || phase === 'mainFadeOut' || (phase === 'subservicesReveal' && typedMain)) && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: phase === 'mainFadeOut' ? 0 : 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: phase === 'mainFadeOut' ? 0.4 : 0.3 }}
+                  className="mb-6"
                 >
-                  Get This Service
-                </Link>
-              </motion.div>
-            )}
+                  <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
+                  <p className="text-sm md:text-base text-foreground/80 leading-relaxed">
+                    {typedMain}
+                    {typedMain.length < serviceData.main.length && <span className="animate-pulse">|</span>}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Services Breakdown - Shows after phase 3 */}
+            <AnimatePresence>
+              {phase === 'subservicesReveal' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">
+                    Services Included ({serviceData.subDescriptions.length})
+                  </p>
+                  
+                  <div className="space-y-2 mb-8">
+                    {serviceData.subDescriptions.map((desc, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ y: 10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: idx * 0.12, duration: 0.3 }}
+                      >
+                        <motion.button
+                          onClick={() => handleSubServiceClick(idx)}
+                          className="w-full group relative flex items-start gap-3 p-3 rounded-lg transition-all cursor-pointer"
+                          style={{
+                            backgroundColor: expandedSubIndex === idx ? 'var(--card)' : 'transparent',
+                            border: expandedSubIndex === idx ? '1px solid var(--border)' : '1px solid var(--border)',
+                          }}
+                          whileHover={{ backgroundColor: 'var(--card)' }}
+                        >
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-foreground/10 text-foreground flex items-center justify-center text-xs font-semibold">
+                            {idx + 1}
+                          </div>
+                          <div className="flex-1 text-left">
+                            <p className="text-sm font-semibold text-foreground">{service.subServices[idx]}</p>
+                            <AnimatePresence>
+                              {expandedSubIndex === idx && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.35 }}
+                                  className="overflow-hidden mt-2"
+                                >
+                                  <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pl-8 border-l border-border">
+                                    {typedSubDescriptions[idx] || ''}
+                                    {typedSubDescriptions[idx] && typedSubDescriptions[idx].length < (serviceData.subDescriptions[idx] || '').length && (
+                                      <span className="animate-pulse">|</span>
+                                    )}
+                                  </p>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                          <motion.div
+                            animate={{ rotate: expandedSubIndex === idx ? 45 : 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex-shrink-0 text-muted-foreground group-hover:text-foreground"
+                          >
+                            +
+                          </motion.div>
+                        </motion.button>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
+                  <motion.div
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: serviceData.subDescriptions.length * 0.12 + 0.3, duration: 0.4 }}
+                  >
+                    <Link
+                      href="/contact"
+                      className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all"
+                    >
+                      Get This Service
+                    </Link>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
 
         {/* Footer */}
         <div className="border-t border-border px-6 md:px-8 py-3 md:py-4 flex justify-between items-center gap-4 flex-wrap text-sm">
-          <button onClick={handleSkip} className="text-xs text-muted-foreground hover:text-foreground transition-colors">Skip Animation</button>
+          <button onClick={handleSkip} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            Skip Animation
+          </button>
           <span className="text-xs text-foreground/50">{currentIndex + 1} of {totalServices}</span>
           <div className="flex gap-2">
-            <button onClick={onPrev} className="p-2 hover:bg-foreground/5 rounded"><ChevronLeft size={18} className="text-foreground/60" /></button>
-            <button onClick={onNext} className="p-2 hover:bg-foreground/5 rounded"><ChevronRight size={18} className="text-foreground/60" /></button>
+            <button onClick={onPrev} className="p-2 hover:bg-foreground/5 rounded transition-colors">
+              <ChevronLeft size={18} className="text-foreground/60" />
+            </button>
+            <button onClick={onNext} className="p-2 hover:bg-foreground/5 rounded transition-colors">
+              <ChevronRight size={18} className="text-foreground/60" />
+            </button>
           </div>
         </div>
       </motion.div>
