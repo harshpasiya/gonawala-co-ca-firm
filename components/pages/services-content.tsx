@@ -1,20 +1,16 @@
 'use client'
 
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
-import Image from 'next/image'
-import { useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, X } from 'lucide-react'
-import { FileText, Calculator, Users, TrendingUp, BarChart3, Globe, DollarSign, ShieldCheck, Briefcase, ListCheck } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-const coreServices = [
+const allServices = [
   {
     id: 1,
     title: 'Accounting & Bookkeeping',
     description: 'Complete bookkeeping and financial statement preparation for comprehensive financial management.',
-    image: '/images/service-1.png',
-    color: 'from-blue-500 to-cyan-500',
-    icon: Calculator,
+    category: 'Core',
     subServices: [
       'Maintaining books of accounts',
       'Preparation of financial statements (Balance Sheet, P&L, Cash Flow)',
@@ -25,9 +21,7 @@ const coreServices = [
     id: 2,
     title: 'Auditing & Assurance',
     description: 'Comprehensive audit services including statutory, tax, internal, and forensic audits.',
-    image: '/images/service-2.png',
-    color: 'from-purple-500 to-pink-500',
-    icon: BarChart3,
+    category: 'Core',
     subServices: [
       'Statutory Audit under Companies Act',
       'Tax Audit under section 44AB',
@@ -39,9 +33,7 @@ const coreServices = [
     id: 3,
     title: 'Taxation Services',
     description: 'Expert tax planning and advisory to optimize your tax liability.',
-    image: '/images/service-3.png',
-    color: 'from-orange-500 to-red-500',
-    icon: FileText,
+    category: 'Core',
     subServices: [
       'Income Tax return filing',
       'Tax planning and advisory',
@@ -53,9 +45,7 @@ const coreServices = [
     id: 4,
     title: 'GST Compliance',
     description: 'Complete GST management and compliance services for seamless tax filing.',
-    image: '/images/feature-1.png',
-    color: 'from-green-500 to-emerald-500',
-    icon: ShieldCheck,
+    category: 'Core',
     subServices: [
       'GST registration and filing',
       'Monthly/quarterly GSTR-1 and GSTR-3B filing',
@@ -67,9 +57,7 @@ const coreServices = [
     id: 5,
     title: 'Corporate & Company Law',
     description: 'Full-spectrum company law services including incorporation and compliance.',
-    image: '/images/feature-2.png',
-    color: 'from-indigo-500 to-purple-500',
-    icon: Briefcase,
+    category: 'Core',
     subServices: [
       'Company incorporation (Pvt Ltd, LLP, OPC)',
       'ROC compliances',
@@ -81,25 +69,19 @@ const coreServices = [
     id: 6,
     title: 'Financial Advisory',
     description: 'Strategic financial planning and business valuation services.',
-    image: '/images/feature-3.png',
-    color: 'from-rose-500 to-orange-500',
-    icon: TrendingUp,
+    category: 'Core',
     subServices: [
       'Personal financial planning',
       'Investment advisory',
       'Business valuation',
       'Project finance and feasibility'
     ]
-  }
-]
-
-const internationalServices = [
+  },
   {
     id: 7,
     title: 'Loan & Fund Raising',
     description: 'Expert assistance in securing financing for business growth.',
-    color: 'from-yellow-500 to-amber-500',
-    icon: DollarSign,
+    category: 'Specialized',
     subServices: [
       'CMA data preparation',
       'Project reports for bank loans',
@@ -111,8 +93,7 @@ const internationalServices = [
     id: 8,
     title: 'NRI Taxation',
     description: 'Non-Resident Indian taxation and compliance services.',
-    color: 'from-blue-600 to-blue-400',
-    icon: Globe,
+    category: 'International',
     subServices: [
       'Income Tax filing for NRI',
       'Residential status determination',
@@ -124,8 +105,7 @@ const internationalServices = [
     id: 9,
     title: 'FEMA Compliance',
     description: 'Foreign Exchange Management Act compliance and advisory.',
-    color: 'from-emerald-500 to-teal-500',
-    icon: Globe,
+    category: 'International',
     subServices: [
       'Foreign investment regulation',
       'Remittance and capital transfer',
@@ -135,10 +115,21 @@ const internationalServices = [
   },
   {
     id: 10,
+    title: 'RBI Filings & Compliances',
+    description: 'RBI regulatory filings and compliance management.',
+    category: 'International',
+    subServices: [
+      'FDI (Foreign Direct Investment) filings',
+      'ODI (Overseas Direct Investment) forms',
+      'ECB (External Commercial Borrowings)',
+      'Annual return on Foreign Liabilities'
+    ]
+  },
+  {
+    id: 11,
     title: 'Transfer Pricing',
     description: 'International transaction transfer pricing documentation and advisory.',
-    color: 'from-amber-500 to-yellow-500',
-    icon: BarChart3,
+    category: 'International',
     subServices: [
       'TP documentation',
       'Form 3CEB compliance',
@@ -147,11 +138,10 @@ const internationalServices = [
     ]
   },
   {
-    id: 11,
-    title: 'International Tax',
+    id: 12,
+    title: 'International Tax Advisory',
     description: 'Cross-border taxation and treaty advisory services.',
-    color: 'from-sky-500 to-cyan-500',
-    icon: Globe,
+    category: 'International',
     subServices: [
       'DTAA advisory',
       'Cross-border tax planning',
@@ -160,200 +150,336 @@ const internationalServices = [
     ]
   },
   {
-    id: 12,
-    title: 'Inbound Investment',
-    description: 'Inbound and outbound investment structuring advisory.',
-    color: 'from-purple-600 to-pink-400',
-    icon: Globe,
+    id: 13,
+    title: 'Insolvency & Bankruptcy',
+    description: 'IBC 2016 and insolvency advisory services.',
+    category: 'Specialized',
     subServices: [
-      'Inbound investment structuring',
-      'Outbound investments',
-      'Subsidiary and JV setup',
-      'Cross-border advisory'
+      'Acting as Insolvency Professional',
+      'Advisory under IBC 2016',
+      'Resolution and liquidation proceedings',
+      'Financial restructuring and recovery'
+    ]
+  },
+  {
+    id: 14,
+    title: 'Startup & Business Advisory',
+    description: 'Startup registration and business advisory services.',
+    category: 'Specialized',
+    subServices: [
+      'Business registration and structure advisory',
+      'Startup India registration',
+      'MSME registration',
+      'Partnership deeds and shareholder agreements'
+    ]
+  },
+  {
+    id: 15,
+    title: 'Payroll & Labour Law',
+    description: 'Payroll processing and labour law compliance services.',
+    category: 'Specialized',
+    subServices: [
+      'Salary structuring and payroll processing',
+      'PF, ESIC, and Professional Tax compliance',
+      'Labour law advisory',
+      'Statutory reporting and filings'
+    ]
+  },
+  {
+    id: 16,
+    title: 'Certification Services',
+    description: 'Financial and professional certification services.',
+    category: 'Specialized',
+    subServices: [
+      'Net worth certificates',
+      'Income certificates for visa and loans',
+      'Turnover certificates',
+      'Form 15CB (remittance certification)'
+    ]
+  },
+  {
+    id: 17,
+    title: 'Foreign Asset Reporting',
+    description: 'Foreign asset disclosure and reporting services.',
+    category: 'International',
+    subServices: [
+      'Schedule FA (Foreign Assets) reporting',
+      'Foreign bank account reporting',
+      'Foreign property and securities reporting',
+      'Penalty and prosecution protection'
+    ]
+  },
+  {
+    id: 18,
+    title: 'Inbound & Outbound Investment',
+    description: 'Inbound and outbound investment advisory services.',
+    category: 'International',
+    subServices: [
+      'Inbound investment structuring (FDI routes)',
+      'Outbound investments by Indian companies',
+      'Setting up subsidiaries and JVs',
+      'Cross-border transaction advisory'
     ]
   }
 ]
 
+function TypeWriter({ text, speed = 50, onComplete }: { text: string; speed?: number; onComplete?: () => void }) {
+  const [displayedText, setDisplayedText] = useState('')
+
+  useEffect(() => {
+    if (displayedText === text) {
+      onComplete?.()
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setDisplayedText(text.slice(0, displayedText.length + 1))
+    }, speed)
+
+    return () => clearTimeout(timer)
+  }, [displayedText, text, speed, onComplete])
+
+  return <span>{displayedText}</span>
+}
+
+function ServiceCard({ service, isSelected, onClick }: { service: typeof allServices[0]; isSelected: boolean; onClick: () => void }) {
+  return (
+    <motion.button
+      onClick={onClick}
+      whileHover={{ x: 4 }}
+      whileTap={{ scale: 0.98 }}
+      className={`group relative px-6 py-4 text-left border transition-all duration-300 w-full ${
+        isSelected
+          ? 'border-foreground bg-foreground/5'
+          : 'border-border hover:border-foreground/50 bg-transparent hover:bg-foreground/2.5'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-foreground text-sm leading-snug">{service.title}</h3>
+          <p className="text-xs text-foreground/50 mt-1 line-clamp-1">{service.category}</p>
+        </div>
+        <motion.span
+          animate={{ x: isSelected ? 4 : 0 }}
+          className="text-foreground/40 group-hover:text-foreground/60 flex-shrink-0"
+        >
+          →
+        </motion.span>
+      </div>
+
+      <motion.div
+        layoutId={`underline-${service.id}`}
+        className="absolute bottom-0 left-0 right-0 h-px bg-foreground"
+        initial={false}
+        animate={{ scaleX: isSelected ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+        style={{ originX: 0 }}
+      />
+    </motion.button>
+  )
+}
+
+function DetailPanel({ service, onNext, onPrev, totalServices, onClose }: { service: typeof allServices[0]; onNext: () => void; onPrev: () => void; totalServices: number; onClose: () => void }) {
+  const [phase, setPhase] = useState<'idle' | 'mainTyping' | 'mainWait' | 'subTyping' | 'done'>('mainTyping')
+  const currentIndex = allServices.findIndex(s => s.id === service.id)
+  const progress = ((currentIndex + 1) / totalServices) * 100
+
+  const handleMainTypeComplete = () => {
+    setPhase('mainWait')
+    setTimeout(() => {
+      setPhase('subTyping')
+    }, 800)
+  }
+
+  const handleSubTypeComplete = () => {
+    setPhase('done')
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+    >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-background border border-border rounded-lg max-w-2xl w-full my-8"
+      >
+        <div className="border-b border-border px-8 py-6">
+          <motion.h2
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-3xl md:text-4xl font-bold text-foreground mb-2"
+          >
+            <TypeWriter text={service.title} speed={40} onComplete={handleMainTypeComplete} />
+          </motion.h2>
+          <p className="text-sm text-foreground/50">{service.category}</p>
+        </div>
+
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+          className="h-0.5 bg-foreground/20"
+          style={{ width: `${progress}%`, transformOrigin: 'left' }}
+        />
+
+        <div className="px-8 py-8 space-y-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <h3 className="text-sm font-semibold text-foreground/60 uppercase tracking-wider mb-2">Overview</h3>
+            <p className="text-foreground/70 leading-relaxed">{service.description}</p>
+          </motion.div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-foreground/60 uppercase tracking-wider mb-4">
+              <TypeWriter
+                text={`Services Included (${service.subServices.length})`}
+                speed={30}
+                onComplete={handleSubTypeComplete}
+              />
+            </h3>
+            <div className="space-y-2">
+              {phase !== 'idle' && phase !== 'mainTyping' && (
+                <motion.ul
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                      opacity: 1,
+                      transition: {
+                        staggerChildren: 0.08,
+                        delayChildren: 0.1,
+                      },
+                    },
+                  }}
+                  className="space-y-2"
+                >
+                  {service.subServices.map((subService, index) => (
+                    <motion.li
+                      key={index}
+                      variants={{
+                        hidden: { opacity: 0, x: -12 },
+                        visible: { opacity: 1, x: 0, transition: { duration: 0.4 } },
+                      }}
+                      className="flex items-start gap-3"
+                    >
+                      <span className="w-6 h-6 rounded-full bg-foreground/10 flex items-center justify-center flex-shrink-0 text-xs font-semibold text-foreground/70 mt-0.5">
+                        {index + 1}
+                      </span>
+                      <span className="text-foreground/70 text-sm leading-relaxed pt-0.5">{subService}</span>
+                    </motion.li>
+                  ))}
+                </motion.ul>
+              )}
+            </div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="pt-4"
+          >
+            <Link
+              href="/contact"
+              className="inline-block px-6 py-2.5 bg-foreground text-background rounded text-sm font-semibold hover:bg-foreground/90 transition-colors"
+            >
+              Get This Service
+            </Link>
+          </motion.div>
+        </div>
+
+        <div className="border-t border-border px-8 py-4 flex items-center justify-between gap-4">
+          <div className="text-xs text-foreground/50">
+            {currentIndex + 1} of {totalServices}
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={onPrev}
+              className="p-2 hover:bg-foreground/5 rounded transition-colors"
+              aria-label="Previous service"
+            >
+              <ChevronLeft size={18} className="text-foreground/60" />
+            </button>
+            <button
+              onClick={onNext}
+              className="p-2 hover:bg-foreground/5 rounded transition-colors"
+              aria-label="Next service"
+            >
+              <ChevronRight size={18} className="text-foreground/60" />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 export function ServicesContent() {
-  const [selectedService, setSelectedService] = useState<typeof coreServices[0] | null>(null)
-  const ref = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start start', 'end start'],
-  })
-  const y = useTransform(scrollYProgress, [0, 1], [0, 100])
+  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null)
+  const selectedService = allServices.find(s => s.id === selectedServiceId)
+
+  const handleNext = () => {
+    if (selectedServiceId === null) return
+    const currentIndex = allServices.findIndex(s => s.id === selectedServiceId)
+    const nextIndex = (currentIndex + 1) % allServices.length
+    setSelectedServiceId(allServices[nextIndex].id)
+  }
+
+  const handlePrev = () => {
+    if (selectedServiceId === null) return
+    const currentIndex = allServices.findIndex(s => s.id === selectedServiceId)
+    const prevIndex = (currentIndex - 1 + allServices.length) % allServices.length
+    setSelectedServiceId(allServices[prevIndex].id)
+  }
 
   return (
     <>
-      {/* Hero Section */}
-      <section ref={ref} className="min-h-screen relative overflow-hidden pt-16 flex items-center bg-background">
-        <motion.div className="absolute inset-0 z-0" style={{ y }}>
-          <Image
-            src="/images/hero-bg.png"
-            alt="Services background"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-background/80" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
-        </motion.div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="max-w-2xl">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="space-y-8"
+      <section className="min-h-[60vh] flex items-center py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl"
+          >
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
+              Comprehensive Financial Services
+            </h1>
+            <p className="text-lg text-foreground/60 mb-8 leading-relaxed">
+              Eighteen specialized services covering all aspects of financial management, accounting, taxation, and international compliance. Select a service to explore our offerings.
+            </p>
+            <Link
+              href="/contact"
+              className="inline-block px-6 py-3 bg-foreground text-background rounded text-sm font-semibold hover:bg-foreground/90 transition-colors"
             >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-              >
-                <span className="inline-block text-sm uppercase tracking-widest text-foreground/60 mb-4">
-                  Our Services
-                </span>
-                <h1 className="text-6xl md:text-7xl font-bold text-balance leading-tight mb-4 text-foreground">
-                  Comprehensive Financial Solutions
-                </h1>
-              </motion.div>
-
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-                className="text-lg text-foreground/70 leading-relaxed max-w-xl"
-              >
-                From accounting to international taxation, we deliver expert financial services across 12 core and 6 specialized international services.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-                className="flex flex-col sm:flex-row gap-4 pt-4"
-              >
-                <Link
-                  href="/contact"
-                  className="px-8 py-4 bg-foreground text-background rounded-lg font-semibold hover:bg-foreground/90 transition-all flex items-center justify-center gap-2 group w-full sm:w-auto"
-                >
-                  Get Started
-                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  href="/"
-                  className="px-8 py-4 border border-foreground/30 text-foreground rounded-lg font-semibold hover:bg-foreground/5 transition-colors w-full sm:w-auto text-center"
-                >
-                  Back Home
-                </Link>
-              </motion.div>
-            </motion.div>
-          </div>
+              Get Started Today
+            </Link>
+          </motion.div>
         </div>
       </section>
 
-      {/* Core Services with Images */}
-      <section className="py-24 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 border-t border-border">
+        <div className="max-w-7xl mx-auto">
+          <motion.h2
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-20"
+            className="text-2xl md:text-3xl font-bold text-foreground mb-8"
           >
-            <span className="text-sm uppercase tracking-widest text-foreground/60 block mb-4">Core Services</span>
-            <h2 className="text-5xl md:text-6xl font-bold text-foreground">
-              Professional Expertise Across All Domains
-            </h2>
-          </motion.div>
-
-          <div className="space-y-24">
-            {coreServices.map((service, index) => (
-              <motion.button
-                key={service.id}
-                onClick={() => setSelectedService(service)}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="group w-full text-left"
-              >
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? 'md:grid-cols-2' : ''}`}>
-                  {index % 2 === 0 ? (
-                    <>
-                      <motion.div whileHover={{ scale: 1.05 }} className="relative h-96 rounded-2xl overflow-hidden">
-                        <Image
-                          src={service.image}
-                          alt={service.title}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                      </motion.div>
-                      <div className="space-y-6">
-                        <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${service.color} flex items-center justify-center`}>
-                          <service.icon className="w-6 h-6 text-white" />
-                        </div>
-                        <h3 className="text-4xl font-bold text-foreground">{service.title}</h3>
-                        <p className="text-lg text-foreground/70 leading-relaxed">{service.description}</p>
-                        <div className="flex gap-4">
-                          <div className="h-1 w-12 bg-foreground" />
-                        </div>
-                        <button className="text-foreground font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
-                          View Details
-                          <ArrowRight size={20} />
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="space-y-6 order-2 md:order-1">
-                        <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${service.color} flex items-center justify-center`}>
-                          <service.icon className="w-6 h-6 text-white" />
-                        </div>
-                        <h3 className="text-4xl font-bold text-foreground">{service.title}</h3>
-                        <p className="text-lg text-foreground/70 leading-relaxed">{service.description}</p>
-                        <div className="flex gap-4">
-                          <div className="h-1 w-12 bg-foreground" />
-                        </div>
-                        <button className="text-foreground font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
-                          View Details
-                          <ArrowRight size={20} />
-                        </button>
-                      </div>
-                      <motion.div whileHover={{ scale: 1.05 }} className="relative h-96 rounded-2xl overflow-hidden order-1 md:order-2">
-                        <Image
-                          src={service.image}
-                          alt={service.title}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                      </motion.div>
-                    </>
-                  )}
-                </div>
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* International Services Grid */}
-      <section className="py-24 bg-foreground/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-20"
-          >
-            <span className="text-sm uppercase tracking-widest text-foreground/60 block mb-4">International & Specialized</span>
-            <h2 className="text-5xl md:text-6xl font-bold text-foreground">
-              Global Financial Services
-            </h2>
-          </motion.div>
+            Our Services
+          </motion.h2>
 
           <motion.div
             initial="hidden"
@@ -364,136 +490,41 @@ export function ServicesContent() {
               visible: {
                 opacity: 1,
                 transition: {
-                  staggerChildren: 0.1,
+                  staggerChildren: 0.04,
                   delayChildren: 0.1,
                 },
               },
             }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
           >
-            {internationalServices.map((service) => {
-              const IconComponent = service.icon
-              return (
-                <motion.button
-                  key={service.id}
-                  onClick={() => setSelectedService(service as any)}
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-                  }}
-                  whileHover={{ scale: 1.05, y: -10 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="group relative h-72 rounded-2xl overflow-hidden cursor-pointer text-left"
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-90 group-hover:opacity-100 transition-opacity`} />
-                  <div className="relative h-full p-6 flex flex-col justify-between">
-                    <div>
-                      <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center mb-4 group-hover:bg-white/30 transition-colors">
-                        <IconComponent className="w-6 h-6 text-white" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">
-                        {service.title}
-                      </h3>
-                      <p className="text-sm text-white/80 line-clamp-2">
-                        {service.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-white/70">
-                        {service.subServices.length} services
-                      </span>
-                      <motion.span
-                        animate={{ x: [0, 4, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="text-white"
-                      >
-                        →
-                      </motion.span>
-                    </div>
-                  </div>
-                </motion.button>
-              )
-            })}
+            {allServices.map((service) => (
+              <motion.div
+                key={service.id}
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+                }}
+              >
+                <ServiceCard
+                  service={service}
+                  isSelected={selectedServiceId === service.id}
+                  onClick={() => setSelectedServiceId(service.id)}
+                />
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
 
-      {/* Service Detail Modal */}
       <AnimatePresence>
         {selectedService && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedService(null)}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-background rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            >
-              <div className="sticky top-0 bg-background border-b border-foreground/10 px-8 py-6 flex justify-between items-center">
-                <h2 className="text-3xl font-bold text-foreground">{selectedService.title}</h2>
-                <button
-                  onClick={() => setSelectedService(null)}
-                  className="text-foreground/70 hover:text-foreground transition-colors"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-
-              <div className="p-8 space-y-6">
-                {'image' in selectedService && (
-                  <div className="relative h-96 rounded-2xl overflow-hidden">
-                    <Image
-                      src={selectedService.image}
-                      alt={selectedService.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Overview</h3>
-                  <p className="text-foreground/70 leading-relaxed">{selectedService.description}</p>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-4">Services Included ({selectedService.subServices.length})</h3>
-                  <ul className="space-y-2">
-                    {selectedService.subServices.map((subService, index) => (
-                      <motion.li
-                        key={index}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex items-start gap-3"
-                      >
-                        <span className="w-6 h-6 rounded-full bg-foreground/20 flex items-center justify-center flex-shrink-0 text-sm font-semibold text-foreground">
-                          {index + 1}
-                        </span>
-                        <span className="text-foreground/70 pt-0.5">{subService}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="pt-4">
-                  <Link
-                    href="/contact"
-                    className="inline-block px-8 py-3 bg-foreground text-background rounded-lg font-semibold hover:bg-foreground/90 transition-all flex items-center gap-2 group w-full text-center justify-center"
-                  >
-                    Get This Service
-                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+          <DetailPanel
+            service={selectedService}
+            onNext={handleNext}
+            onPrev={handlePrev}
+            totalServices={allServices.length}
+            onClose={() => setSelectedServiceId(null)}
+          />
         )}
       </AnimatePresence>
     </>
