@@ -32,9 +32,9 @@ const processSteps = [
 ]
 
 function StepCard({ step, index, scrollYProgress }: { step: typeof processSteps[0]; index: number; scrollYProgress: any }) {
-  // Staggered scroll offsets for overlay effect
-  const stepStart = 0.1 + index * 0.22
-  const stepEnd = stepStart + 0.25
+  // Staggered scroll offsets for overlay effect - each step gets 25% of scroll range
+  const stepStart = index * 0.25
+  const stepEnd = stepStart + 0.3
 
   const stepProgress = useTransform(
     scrollYProgress,
@@ -48,13 +48,13 @@ function StepCard({ step, index, scrollYProgress }: { step: typeof processSteps[
   
   // Overlay fade: fade in, stay visible, then fade out (except last step)
   const opacity = isLastStep 
-    ? useTransform(stepProgress, [0, 0.15], [0, 1], { clamp: true })
-    : useTransform(stepProgress, [0, 0.2, 0.75, 1], [0, 1, 1, 0], { clamp: true })
+    ? useTransform(stepProgress, [0, 0.2], [0, 1], { clamp: true })
+    : useTransform(stepProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0], { clamp: true })
 
   // Scale down slightly as it fades out
   const scale = isLastStep
-    ? useTransform(stepProgress, [0, 0.15], [0.95, 1], { clamp: true })
-    : useTransform(stepProgress, [0, 0.2, 0.75, 1], [0.95, 1, 1, 0.95], { clamp: true })
+    ? useTransform(stepProgress, [0, 0.2], [0.95, 1], { clamp: true })
+    : useTransform(stepProgress, [0, 0.2, 0.8, 1], [0.95, 1, 1, 0.95], { clamp: true })
 
   return (
     <motion.div
