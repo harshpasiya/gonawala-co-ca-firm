@@ -404,119 +404,127 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
             transition={{ duration: 0.3 }}
             className="overflow-y-auto p-5 md:p-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border"
           >
-            {/* OVERVIEW Section - Mounted at all times, fades out/in based on state */}
-            <motion.div
-              initial={{ opacity: 1 }}
-              animate={{ opacity: overviewVisible ? 1 : 0 }}
-              transition={{ duration: 0.4 }}
-              onAnimationComplete={() => {
-                // Only transition to subservicesReveal after fade-out completes
-                if (phase === 'mainFadeOut' && !overviewVisible) {
-                  setPhase('subservicesReveal')
-                }
-              }}
-              className="mb-6"
-              style={{ 
-                minHeight: '120px',
-                display: overviewHidden ? 'none' : 'block'
-              }}
-            >
-              <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
-              <p className="text-sm md:text-base text-foreground/80 leading-relaxed font-sans">
-                {phase === 'done' ? serviceData.main : typedMain}
-                {phase !== 'done' && typedMain.length < serviceData.main.length && <span className="animate-pulse">|</span>}
-              </p>
-            </motion.div>
+            {/* OVERVIEW Section - Fades out completely and is removed from layout */}
+            <AnimatePresence mode="wait">
+              {!overviewHidden && (
+                <motion.div
+                  key="overview"
+                  initial={{ opacity: 1, height: 'auto' }}
+                  animate={{ opacity: overviewVisible ? 1 : 0 }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.4 }}
+                  onAnimationComplete={() => {
+                    // Only transition to subservicesReveal after fade-out completes
+                    if (phase === 'mainFadeOut' && !overviewVisible) {
+                      setPhase('subservicesReveal')
+                    }
+                  }}
+                  className="mb-6 overflow-hidden"
+                >
+                  <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
+                  <p className="text-sm md:text-base text-foreground/80 leading-relaxed font-sans">
+                    {phase === 'done' ? serviceData.main : typedMain}
+                    {phase !== 'done' && typedMain.length < serviceData.main.length && <span className="animate-pulse">|</span>}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {/* Services Breakdown - Fades in when subservices start revealing */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: phase === 'subservicesReveal' || phase === 'done' ? 1 : 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">
-                Services Included ({serviceData.subDescriptions.length})
-              </p>
-              
-              <div className="space-y-2 mb-8">
-                {serviceData.subDescriptions.map((desc, idx) => (
+            {/* Services Breakdown - Fades in from top after OVERVIEW is removed */}
+            <AnimatePresence>
+              {(phase === 'subservicesReveal' || phase === 'done') && (
+                <motion.div
+                  key="services"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.5, type: 'spring', stiffness: 80, damping: 18 }}
+                >
+                  <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">
+                    Services Included ({serviceData.subDescriptions.length})
+                  </p>
+                  
+                  <div className="space-y-2 mb-8">
+                    {serviceData.subDescriptions.map((desc, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ y: 12, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ 
+                          delay: idx * 0.12, 
+                          duration: 0.35,
+                          type: 'spring',
+                          stiffness: 100,
+                          damping: 15
+                        }}
+                      >
+                        <motion.button
+                          onClick={() => handleSubServiceClick(idx)}
+                          className="w-full group relative flex items-start gap-3 p-3 rounded-lg transition-all cursor-pointer"
+                          style={{
+                            backgroundColor: expandedSubIndex === idx ? 'var(--card)' : 'transparent',
+                            border: expandedSubIndex === idx ? '1px solid var(--border)' : '1px solid var(--border)',
+                          }}
+                          whileHover={{ backgroundColor: 'var(--card)', scale: 1.02 }}
+                        >
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-foreground/10 text-foreground flex items-center justify-center text-xs font-semibold">
+                            {idx + 1}
+                          </div>
+                          <div className="flex-1 text-left">
+                            <p className="text-sm font-semibold text-foreground">{service.subServices[idx]}</p>
+                            <AnimatePresence>
+                              {expandedSubIndex === idx && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.35 }}
+                                  className="overflow-hidden mt-2"
+                                >
+                                  <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pl-8 border-l border-border font-sans">
+                                    {typedSubDescriptions[idx] || ''}
+                                    {typedSubDescriptions[idx] && typedSubDescriptions[idx].length < (serviceData.subDescriptions[idx] || '').length && (
+                                      <span className="animate-pulse">|</span>
+                                    )}
+                                  </p>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                          <motion.div
+                            animate={{ rotate: expandedSubIndex === idx ? 45 : 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex-shrink-0 text-muted-foreground group-hover:text-foreground"
+                          >
+                            +
+                          </motion.div>
+                        </motion.button>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* CTA Button */}
                   <motion.div
-                    key={idx}
-                    initial={{ y: 12, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
+                    initial={{ y: 15, opacity: 0, scale: 0.95 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
                     transition={{ 
-                      delay: idx * 0.12, 
-                      duration: 0.35,
+                      delay: serviceData.subDescriptions.length * 0.12 + 0.4, 
+                      duration: 0.5,
                       type: 'spring',
-                      stiffness: 100,
-                      damping: 15
+                      stiffness: 80,
+                      damping: 18
                     }}
                   >
-                    <motion.button
-                      onClick={() => handleSubServiceClick(idx)}
-                      className="w-full group relative flex items-start gap-3 p-3 rounded-lg transition-all cursor-pointer"
-                      style={{
-                        backgroundColor: expandedSubIndex === idx ? 'var(--card)' : 'transparent',
-                        border: expandedSubIndex === idx ? '1px solid var(--border)' : '1px solid var(--border)',
-                      }}
-                      whileHover={{ backgroundColor: 'var(--card)', scale: 1.02 }}
+                    <Link
+                      href="/contact"
+                      className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all hover:shadow-lg"
                     >
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-foreground/10 text-foreground flex items-center justify-center text-xs font-semibold">
-                        {idx + 1}
-                      </div>
-                      <div className="flex-1 text-left">
-                        <p className="text-sm font-semibold text-foreground">{service.subServices[idx]}</p>
-                        <AnimatePresence>
-                          {expandedSubIndex === idx && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.35 }}
-                              className="overflow-hidden mt-2"
-                            >
-                              <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pl-8 border-l border-border font-sans">
-                                {typedSubDescriptions[idx] || ''}
-                                {typedSubDescriptions[idx] && typedSubDescriptions[idx].length < (serviceData.subDescriptions[idx] || '').length && (
-                                  <span className="animate-pulse">|</span>
-                                )}
-                              </p>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                      <motion.div
-                        animate={{ rotate: expandedSubIndex === idx ? 45 : 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="flex-shrink-0 text-muted-foreground group-hover:text-foreground"
-                      >
-                        +
-                      </motion.div>
-                    </motion.button>
+                      Get This Service
+                    </Link>
                   </motion.div>
-                ))}
-              </div>
-
-              {/* CTA Button */}
-              <motion.div
-                initial={{ y: 15, opacity: 0, scale: 0.95 }}
-                animate={{ y: 0, opacity: 1, scale: 1 }}
-                transition={{ 
-                  delay: serviceData.subDescriptions.length * 0.12 + 0.4, 
-                  duration: 0.5,
-                  type: 'spring',
-                  stiffness: 80,
-                  damping: 18
-                }}
-              >
-                <Link
-                  href="/contact"
-                  className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all hover:shadow-lg"
-                >
-                  Get This Service
-                </Link>
-              </motion.div>
-            </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
 
