@@ -363,7 +363,7 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
           >
             {/* OVERVIEW Section - Fades out after typing */}
             <AnimatePresence>
-              {(phase === 'mainTyping' || phase === 'mainFadeOut' || (phase === 'subservicesReveal' && typedMain)) && (
+              {(phase === 'mainTyping' || phase === 'mainFadeOut') && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: phase === 'mainFadeOut' ? 0 : 1 }}
