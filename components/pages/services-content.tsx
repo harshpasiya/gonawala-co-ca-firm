@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { FileText, Calculator, Users, TrendingUp, BarChart3, Globe, DollarSign, ShieldCheck, Briefcase, ListCheck, Zap, Eye } from 'lucide-react'
+import { FileText, Calculator, Users, TrendingUp, BarChart3, Globe, DollarSign, ShieldCheck, Briefcase, ListCheck } from 'lucide-react'
 
 const allServices = [
   {
@@ -12,7 +12,6 @@ const allServices = [
     category: 'Accounting & Bookkeeping',
     icon: Calculator,
     color: 'from-blue-500 to-cyan-500',
-    image: '/images/service-1.png',
     description: 'Complete bookkeeping and accounting solutions for your business',
     services: [
       'Maintaining books of accounts',
@@ -25,13 +24,12 @@ const allServices = [
     category: 'Auditing & Assurance',
     icon: BarChart3,
     color: 'from-purple-500 to-pink-500',
-    image: '/images/service-2.png',
     description: 'Comprehensive audit and assurance services',
     services: [
       'Statutory Audit – mandatory audit under Companies Act',
       'Tax Audit – u/s 44AB of Income Tax Act',
       'Internal Audit – reviewing internal controls and processes',
-      'Bank Audit – concurrent, stock, and branch audits',
+      'Bank Audit – concurrent and stock audits',
       'Forensic Audit – detecting fraud and financial irregularities',
       'Cost Audit – audit of cost records',
       'Stock Audit – physical verification of inventory',
@@ -42,69 +40,59 @@ const allServices = [
     category: 'Taxation Services',
     icon: FileText,
     color: 'from-orange-500 to-red-500',
-    image: '/images/service-3.png',
     description: 'Expert tax planning and compliance services',
     services: [
       'Income Tax return filing (individuals, firms, companies)',
       'Tax planning and advisory',
       'TDS/TCS compliance and return filing',
-      'Advance tax computation',
-      'Handling income tax notices and assessments',
-      'Appeal filing before CIT(A), ITAT',
+      'Advance tax computation and appeal filing',
     ],
   },
   {
     id: 4,
-    category: 'GST (Goods & Services Tax)',
+    category: 'GST Compliance',
     icon: ShieldCheck,
     color: 'from-green-500 to-emerald-500',
-    image: '/images/service-4.png',
-    description: 'Complete GST registration and compliance',
+    description: 'Goods & Services Tax compliance and advisory',
     services: [
-      'GST registration',
-      'Monthly/quarterly GST return filing (GSTR-1, GSTR-3B, etc.)',
+      'GST registration and filing',
+      'Monthly/quarterly GST return filing (GSTR-1, GSTR-3B)',
       'GST audit and reconciliation',
-      'GST refund claims',
-      'Advisory on GST applicability and classification',
+      'GST refund claims and advisory',
     ],
   },
   {
     id: 5,
-    category: 'Corporate & Company Law Services',
+    category: 'Corporate & Company Law',
     icon: Briefcase,
-    color: 'from-indigo-500 to-blue-500',
-    image: '/images/service-5.png',
-    description: 'Corporate compliance and legal advisory',
+    color: 'from-indigo-500 to-purple-500',
+    description: 'Corporate compliance and company law services',
     services: [
-      'Company incorporation (Pvt Ltd, LLP, OPC, etc.)',
+      'Company incorporation (Pvt Ltd, LLP, OPC)',
       'ROC (Registrar of Companies) compliances',
       'Filing of annual returns and forms with MCA',
       'Drafting of MOA, AOA, board resolutions',
-      'Secretarial services and compliance under Companies Act 2013',
     ],
   },
   {
     id: 6,
-    category: 'Financial Advisory & Planning',
+    category: 'Financial Advisory',
     icon: TrendingUp,
-    color: 'from-teal-500 to-cyan-500',
-    image: '/images/service-6.png',
+    color: 'from-rose-500 to-orange-500',
     description: 'Strategic financial planning and advisory',
     services: [
       'Personal financial planning',
       'Investment advisory',
       'Business valuation',
       'Project finance and feasibility reports',
-      'Budgeting and forecasting',
     ],
   },
   {
     id: 7,
     category: 'Loan & Fund Raising',
     icon: DollarSign,
-    color: 'from-yellow-500 to-orange-500',
-    image: '/images/service-7.png',
-    description: 'Loan preparation and fund raising assistance',
+    color: 'from-yellow-500 to-amber-500',
+    description: 'Loan and fund raising assistance',
     services: [
       'Preparation of CMA (Credit Monitoring Arrangement) data',
       'Project reports for bank loans',
@@ -114,39 +102,36 @@ const allServices = [
   },
   {
     id: 8,
-    category: 'Insolvency & Bankruptcy (IBC)',
+    category: 'Insolvency & Bankruptcy',
     icon: ShieldCheck,
-    color: 'from-red-500 to-pink-500',
-    image: '/images/service-8.png',
-    description: 'Insolvency and bankruptcy resolution services',
+    color: 'from-cyan-500 to-blue-500',
+    description: 'IBC 2016 and insolvency advisory',
     services: [
       'Acting as Insolvency Professional (IP)',
       'Advisory under IBC 2016',
       'Resolution and liquidation proceedings',
+      'Financial restructuring and recovery',
     ],
   },
   {
     id: 9,
     category: 'Startup & Business Advisory',
-    icon: Zap,
+    icon: Briefcase,
     color: 'from-pink-500 to-rose-500',
-    image: '/images/service-9.png',
-    description: 'Support for startups and business ventures',
+    description: 'Startup registration and business advisory',
     services: [
       'Business registration and structure advisory',
       'Startup India registration',
       'MSME registration',
-      'Drafting of partnership deeds, shareholder agreements',
-      'Due diligence for mergers & acquisitions',
+      'Drafting of partnership deeds and shareholder agreements',
     ],
   },
   {
     id: 10,
-    category: 'Payroll & Labour Law Compliance',
+    category: 'Payroll & Labour Law',
     icon: Users,
-    color: 'from-cyan-500 to-blue-500',
-    image: '/images/service-10.png',
-    description: 'Payroll processing and labour compliance',
+    color: 'from-teal-500 to-cyan-500',
+    description: 'Payroll processing and labour law compliance',
     services: [
       'Salary structuring and payroll processing',
       'PF, ESIC, and Professional Tax compliance',
@@ -159,139 +144,109 @@ const allServices = [
     category: 'Certification Services',
     icon: ListCheck,
     color: 'from-violet-500 to-purple-500',
-    image: '/images/service-11.png',
-    description: 'Official certificates for various purposes',
+    description: 'Financial and professional certifications',
     services: [
       'Net worth certificates',
       'Income certificates for visa and loan purposes',
       'Turnover certificates',
       'Form 15CB (remittance certification)',
-      'Various certificates required by banks, courts, and regulators',
     ],
   },
   {
     id: 12,
     category: 'NRI Taxation',
     icon: Globe,
-    color: 'from-sky-500 to-blue-500',
-    image: '/images/service-12.png',
-    description: 'Specialized taxation services for NRIs',
+    color: 'from-blue-600 to-blue-400',
+    description: 'Non-Resident Indian taxation services',
     services: [
-      'Filing Income Tax Returns for NRIs',
-      'Determining residential status (NRI / RNOR / Resident) under FEMA and Income Tax Act',
-      'Taxability of Indian income (rent, interest, capital gains) for NRIs',
-      'Advisory on TDS applicable on NRI transactions',
-      'Claiming DTAA (Double Tax Avoidance Agreement) benefits to avoid double taxation',
+      'Income Tax filing for NRI',
+      'Residential status determination',
+      'Foreign asset reporting',
+      'FEMA compliance for NRI account holders',
     ],
   },
   {
     id: 13,
-    category: 'FEMA (Foreign Exchange Management Act) Compliance',
-    icon: Eye,
+    category: 'FEMA Compliance',
+    icon: Globe,
     color: 'from-emerald-500 to-teal-500',
-    image: '/images/service-13.png',
-    description: 'Foreign exchange compliance and advisory',
+    description: 'Foreign Exchange Management Act compliance',
     services: [
-      'Advisory on permissible and prohibited transactions under FEMA',
-      'Compounding of FEMA contraventions',
-      'Repatriation of funds from India to abroad',
-      'NRE / NRO / FCNR account advisory and compliance',
-      'Reporting of foreign assets and liabilities',
+      'Foreign investment regulation advisory',
+      'Remittance and capital transfer compliance',
+      'AD Code maintenance and compliance',
+      'FEMA return filings and documentation',
     ],
   },
   {
     id: 14,
-    category: 'RBI Filings & Compliances',
-    icon: ShieldCheck,
-    color: 'from-rose-500 to-pink-500',
-    image: '/images/service-14.png',
+    category: 'RBI Filings',
+    icon: BarChart3,
+    color: 'from-red-500 to-orange-500',
     description: 'RBI regulatory filings and compliance',
     services: [
-      'FDI (Foreign Direct Investment) – FC-GPR, FC-TRS filings',
-      'ODI (Overseas Direct Investment) – Form ODI filing',
-      'ECB (External Commercial Borrowings) – Form ECB filings',
-      'Annual return on Foreign Liabilities and Assets (FLA Return)',
+      'FDI (Foreign Direct Investment) filings',
+      'ODI (Overseas Direct Investment) – Form ODI',
+      'ECB (External Commercial Borrowings)',
+      'Annual return on Foreign Liabilities and Assets',
     ],
   },
   {
     id: 15,
     category: 'Transfer Pricing',
     icon: BarChart3,
-    color: 'from-amber-500 to-orange-500',
-    image: '/images/service-15.png',
+    color: 'from-amber-500 to-yellow-500',
     description: 'International transaction transfer pricing',
     services: [
-      'Documentation of international transactions between related parties',
+      'Documentation of international transactions',
       'Transfer Pricing Study Report (Form 3CEB)',
       'Advisory on Arm\'s Length Price (ALP)',
-      'Handling Transfer Pricing assessments and disputes',
+      'Transfer Pricing assessments and disputes',
     ],
   },
   {
     id: 16,
-    category: 'International Taxation Advisory',
+    category: 'International Tax Advisory',
     icon: Globe,
-    color: 'from-fuchsia-500 to-purple-500',
-    image: '/images/service-16.png',
-    description: 'Cross-border taxation and advisory',
+    color: 'from-sky-500 to-cyan-500',
+    description: 'International taxation and treaty advisory',
     services: [
-      'Structuring cross-border transactions tax-efficiently',
-      'Permanent Establishment (PE) risk analysis',
-      'Advisory on withholding tax on payments to non-residents',
-      'Tax residency certificates and Form 15CA/15CB for remittances',
-      'BEPS (Base Erosion and Profit Shifting) compliance',
+      'Double Taxation Avoidance Agreement (DTAA) advisory',
+      'Cross-border tax planning',
+      'PE (Permanent Establishment) advisory',
+      'International tax compliance',
     ],
   },
   {
     id: 17,
     category: 'Foreign Asset Reporting',
-    icon: Eye,
-    color: 'from-lime-500 to-green-500',
-    image: '/images/service-17.png',
-    description: 'Foreign asset disclosure and compliance',
+    icon: FileText,
+    color: 'from-pink-600 to-rose-400',
+    description: 'Foreign asset disclosure and reporting',
     services: [
-      'Disclosure of foreign assets in ITR Schedule FA',
-      'Black Money Act compliance for undisclosed foreign income/assets',
-      'Advisory under Foreign Asset disclosure schemes',
+      'Schedule FA (Foreign Assets) reporting',
+      'Foreign bank account reporting',
+      'Foreign property and securities reporting',
+      'Penalty and prosecution protection',
     ],
   },
   {
     id: 18,
-    category: 'Inbound & Outbound Investment Advisory',
-    icon: Briefcase,
-    color: 'from-cyan-500 to-sky-500',
-    image: '/images/service-18.png',
-    description: 'Investment structuring and advisory',
+    category: 'Inbound & Outbound Investment',
+    icon: Globe,
+    color: 'from-purple-600 to-pink-400',
+    description: 'Inbound and outbound investment advisory',
     services: [
-      'Structuring of inbound investments into India (FDI routes, sectoral caps)',
-      'Outbound investments by Indian companies/individuals abroad',
-      'Setting up subsidiaries, JVs, or liaison offices in India or abroad',
+      'Inbound investment structuring (FDI routes)',
+      'Outbound investments by Indian companies',
+      'Setting up subsidiaries and JVs',
+      'Cross-border transaction advisory',
     ],
   },
 ]
 
 export function ServicesContent() {
   const [selectedService, setSelectedService] = useState<typeof allServices[0] | null>(null)
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  }
 
   return (
     <>
@@ -316,48 +271,74 @@ export function ServicesContent() {
       <section className="py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            variants={containerVariants}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
+              Our Services
+            </h2>
+            <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+              Click on any service to explore detailed information and sub-services
+            </p>
+          </motion.div>
+
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: false, margin: '-100px' }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1,
+                  delayChildren: 0.1,
+                },
+              },
+            }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {allServices.map((service, index) => {
-              const Icon = service.icon
+            {allServices.map((service) => {
+              const IconComponent = service.icon
               return (
                 <motion.button
                   key={service.id}
-                  variants={itemVariants}
                   onClick={() => setSelectedService(service)}
-                  className="group relative p-8 rounded-2xl bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 hover:border-foreground/20 transition-all duration-300 text-left cursor-pointer overflow-hidden"
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+                  }}
+                  whileHover={{ scale: 1.05, y: -10 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="group relative h-64 rounded-2xl overflow-hidden cursor-pointer text-left"
                 >
-                  {/* Gradient Background */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-
-                  {/* Icon */}
-                  <div className={`relative z-10 inline-block p-4 rounded-xl bg-gradient-to-br ${service.color} mb-4`}>
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="relative z-10 text-xl font-bold text-foreground mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all">
-                    {service.category}
-                  </h3>
-                  <p className="relative z-10 text-sm text-foreground/70 mb-4">
-                    {service.description}
-                  </p>
-
-                  {/* Sub-services count */}
-                  <div className="relative z-10 flex items-center justify-between">
-                    <span className="text-sm text-foreground/60">
-                      {service.services.length} services
-                    </span>
-                    <motion.span
-                      whileHover={{ x: 4 }}
-                      className="text-foreground/60 group-hover:text-foreground transition-colors"
-                    >
-                      →
-                    </motion.span>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-90 group-hover:opacity-100 transition-opacity`} />
+                  <div className="relative h-full p-6 flex flex-col justify-between">
+                    <div>
+                      <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center mb-4 group-hover:bg-white/30 transition-colors">
+                        <IconComponent className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        {service.category}
+                      </h3>
+                      <p className="text-sm text-white/80 line-clamp-2">
+                        {service.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-white/70">
+                        {service.services.length} services
+                      </span>
+                      <motion.span
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="text-white"
+                      >
+                        →
+                      </motion.span>
+                    </div>
                   </div>
                 </motion.button>
               )
@@ -366,31 +347,7 @@ export function ServicesContent() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-foreground/5 via-foreground/10 to-foreground/5">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-4xl font-bold text-foreground mb-6">
-              Need Professional Financial Guidance?
-            </h2>
-            <p className="text-lg text-foreground/70 mb-8">
-              Choose any of our 18 specialized services to get started
-            </p>
-            <Link
-              href="/contact"
-              className="inline-block px-8 py-4 bg-foreground text-background font-semibold rounded-xl hover:bg-foreground/90 transition-all duration-300 transform hover:scale-105"
-            >
-              Get Started Today
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Service Detail Modal */}
+      {/* Modal */}
       <AnimatePresence>
         {selectedService && (
           <motion.div
@@ -398,74 +355,58 @@ export function ServicesContent() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedService(null)}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
               onClick={(e) => e.stopPropagation()}
               className="bg-background rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             >
-              {/* Header with Close Button */}
-              <div className="sticky top-0 z-10 bg-background border-b border-foreground/10 p-6 flex items-start justify-between">
-                <div>
-                  <h2 className="text-3xl font-bold text-foreground mb-2">
-                    {selectedService.category}
-                  </h2>
-                  <p className="text-foreground/70">
-                    {selectedService.description}
-                  </p>
-                </div>
+              <div className="sticky top-0 flex items-center justify-between p-6 border-b border-foreground/10 bg-background">
+                <h2 className="text-3xl font-bold text-foreground">{selectedService.category}</h2>
                 <button
                   onClick={() => setSelectedService(null)}
                   className="p-2 hover:bg-foreground/10 rounded-lg transition-colors"
                 >
-                  <X className="w-6 h-6 text-foreground" />
+                  <X className="w-6 h-6" />
                 </button>
               </div>
 
-              {/* Content */}
-              <div className="p-8">
-                {/* Services List */}
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-foreground mb-6">
-                    Services Included:
+              <div className="p-6 space-y-6">
+                <p className="text-lg text-foreground/70">{selectedService.description}</p>
+
+                <div>
+                  <h3 className="text-xl font-bold text-foreground mb-4">
+                    Services Included ({selectedService.services.length})
                   </h3>
-                  <ul className="space-y-4">
-                    {selectedService.services.map((service, index) => (
+                  <ul className="space-y-3">
+                    {selectedService.services.map((subService, index) => (
                       <motion.li
                         key={index}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-start gap-4 group"
+                        className="flex gap-3 items-start"
                       >
-                        <div className={`flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br ${selectedService.color} flex items-center justify-center mt-1`}>
-                          <span className="text-white text-sm font-semibold">
-                            {index + 1}
-                          </span>
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-foreground to-foreground/60 flex items-center justify-center text-background text-sm font-bold">
+                          {index + 1}
                         </div>
-                        <div>
-                          <p className="text-foreground font-medium group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all">
-                            {service}
-                          </p>
-                        </div>
+                        <span className="text-foreground/80 pt-0.5">{subService}</span>
                       </motion.li>
                     ))}
                   </ul>
                 </div>
 
-                {/* CTA Button */}
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
                   <Link
                     href="/contact"
-                    className="block w-full px-6 py-3 bg-foreground text-background font-semibold rounded-xl text-center hover:bg-foreground/90 transition-all duration-300"
+                    className="inline-block px-6 py-3 bg-gradient-to-r from-foreground to-foreground/80 text-background rounded-lg font-semibold hover:shadow-lg transition-shadow"
                   >
                     Get This Service
                   </Link>

@@ -1,7 +1,7 @@
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
 import { FloatingButtons } from '@/components/floating-buttons'
-import ServicesContent from '@/components/pages/services-content'
+import { ServicesContent } from '@/components/pages/services-content'
 
 export const metadata = {
   title: 'Services - Elite CA Services',
