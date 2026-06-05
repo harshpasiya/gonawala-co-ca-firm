@@ -173,18 +173,17 @@ function ServiceCard({ service, onClick }: { service: typeof allServices[0]; onC
 }
 
 function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onClose }: any) {
-  const [phase, setPhase] = useState<'headingIn' | 'mainTyping' | 'mainFadeOut' | 'subservicesReveal' | 'done'>('headingIn')
+  const [phase, setPhase] = useState<'headingIn' | 'mainTyping' | 'waitBeforeFade' | 'overviewFadeOut' | 'waitBeforeServices' | 'servicesAppear' | 'waitBeforeFinal' | 'done'>('headingIn')
   const [typedMain, setTypedMain] = useState('')
   const [typedSubDescriptions, setTypedSubDescriptions] = useState<Record<number, string>>({})
   const [expandedSubIndex, setExpandedSubIndex] = useState<number | null>(null)
-  const [overviewVisible, setOverviewVisible] = useState(true)
-  const [overviewHidden, setOverviewHidden] = useState(false)
+  const [showServices, setShowServices] = useState(false)
+  const [showOverviewFinal, setShowOverviewFinal] = useState(false)
   
   // Timer refs for all intervals and timeouts
   const mainTyperRef = useRef<NodeJS.Timeout | null>(null)
   const subDescTyperRef = useRef<NodeJS.Timeout | null>(null)
   const phaseTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const overviewHideTimerRef = useRef<NodeJS.Timeout | null>(null)
   
   const serviceData = mainServiceDescriptions[service.id] || { main: service.description, subDescriptions: service.subServices }
 
@@ -192,13 +191,12 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
     if (mainTyperRef.current) clearInterval(mainTyperRef.current)
     if (subDescTyperRef.current) clearInterval(subDescTyperRef.current)
     if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
-    if (overviewHideTimerRef.current) clearTimeout(overviewHideTimerRef.current)
     setPhase('headingIn')
     setTypedMain('')
     setTypedSubDescriptions({})
     setExpandedSubIndex(null)
-    setOverviewVisible(true)
-    setOverviewHidden(false)
+    setShowServices(false)
+    setShowOverviewFinal(false)
   }
 
   // Phase 1: Heading animation (500ms) -> Phase 2
@@ -213,7 +211,7 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
     }
   }, [phase])
 
-  // Phase 2: Main description typewriter (8ms per char) -> wait 1200ms -> Phase 3
+  // Phase 2: Main description typewriter (8ms per char) -> Phase 3 (wait 2 seconds)
   useEffect(() => {
     if (phase === 'mainTyping') {
       let charIdx = 0
@@ -223,8 +221,8 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
         } else {
           if (mainTyperRef.current) clearInterval(mainTyperRef.current)
           phaseTimerRef.current = setTimeout(() => {
-            setPhase('mainFadeOut')
-          }, 1200)
+            setPhase('waitBeforeFade')
+          }, 2000)
         }
       }, 8)
     }
@@ -233,52 +231,76 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
     }
   }, [phase, serviceData.main])
 
-  // Phase 3: Main fade out (400ms) with onAnimationComplete -> Phase 4
+  // Phase 3: Wait 2 seconds before fading out OVERVIEW
   useEffect(() => {
-    if (phase === 'mainFadeOut') {
-      setOverviewVisible(false)
-      // Phase will be set to subservicesReveal only after fade completes via onAnimationComplete callback
+    if (phase === 'waitBeforeFade') {
+      phaseTimerRef.current = setTimeout(() => {
+        setPhase('overviewFadeOut')
+      }, 2000)
     }
     return () => {
       if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
     }
   }, [phase])
 
-  // Phase 4: Subservices reveal - schedule overview to be hidden after 500ms
+  // Phase 4: OVERVIEW fades out (500ms) -> Phase 5 (wait 2 seconds)
   useEffect(() => {
-    if (phase === 'subservicesReveal') {
-      overviewHideTimerRef.current = setTimeout(() => {
-        setOverviewHidden(true)
+    if (phase === 'overviewFadeOut') {
+      phaseTimerRef.current = setTimeout(() => {
+        setPhase('waitBeforeServices')
       }, 500)
     }
     return () => {
-      if (overviewHideTimerRef.current) clearTimeout(overviewHideTimerRef.current)
+      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
     }
   }, [phase])
 
-  // Phase 5: Done - fade overview back in
+  // Phase 5: Wait 2 seconds before showing services
   useEffect(() => {
-    if (phase === 'done') {
-      setOverviewVisible(true)
-      setOverviewHidden(false)
+    if (phase === 'waitBeforeServices') {
+      phaseTimerRef.current = setTimeout(() => {
+        setPhase('servicesAppear')
+      }, 2000)
     }
     return () => {
       if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
     }
   }, [phase])
 
-  // Trigger subservicesReveal after all subservices have staggered in
+  // Phase 6: Services appear (500ms fade in) -> Phase 7 (wait 2 seconds)
   useEffect(() => {
-    if (phase === 'subservicesReveal') {
-      const totalSubServiceDuration = serviceData.subDescriptions.length * 120 + 600
+    if (phase === 'servicesAppear') {
+      setShowServices(true)
+      phaseTimerRef.current = setTimeout(() => {
+        setPhase('waitBeforeFinal')
+      }, 500)
+    }
+    return () => {
+      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
+    }
+  }, [phase])
+
+  // Phase 7: Wait 2 seconds before showing final state
+  useEffect(() => {
+    if (phase === 'waitBeforeFinal') {
       phaseTimerRef.current = setTimeout(() => {
         setPhase('done')
-      }, totalSubServiceDuration)
+      }, 2000)
     }
     return () => {
       if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
     }
-  }, [phase, serviceData.subDescriptions.length])
+  }, [phase])
+
+  // Phase 8: Done - show OVERVIEW and Services together
+  useEffect(() => {
+    if (phase === 'done') {
+      setShowOverviewFinal(true)
+    }
+    return () => {
+      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
+    }
+  }, [phase])
 
   // Handle subservice expand/collapse with typewriter (8ms per character)
   const handleSubServiceClick = (idx: number) => {
@@ -320,8 +342,8 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
     resetAll()
     setPhase('done')
     setTypedMain(serviceData.main)
-    setOverviewVisible(true)
-    setOverviewHidden(false)
+    setShowServices(true)
+    setShowOverviewFinal(true)
     setExpandedSubIndex(null)
     setTypedSubDescriptions({})
   }
@@ -332,8 +354,14 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
     }
   }, [service.id])
 
-  // Progress calculation: only reaches 100% at the end after all animations
-  const progress = phase === 'done' ? 100 : phase === 'subservicesReveal' ? 80 : phase === 'mainFadeOut' ? 60 : phase === 'mainTyping' ? 40 : 20
+  // Progress calculation: 8 phases
+  const progress = phase === 'done' ? 100 : 
+                   phase === 'waitBeforeFinal' ? 87.5 : 
+                   phase === 'servicesAppear' ? 75 : 
+                   phase === 'waitBeforeServices' ? 62.5 : 
+                   phase === 'overviewFadeOut' ? 50 : 
+                   phase === 'waitBeforeFade' ? 37.5 : 
+                   phase === 'mainTyping' ? 25 : 12.5
 
   return (
     <motion.div
@@ -404,109 +432,114 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
             transition={{ duration: 0.3 }}
             className="overflow-y-auto p-5 md:p-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border"
           >
-            {/* OVERVIEW Section - Fades out completely and is removed from layout */}
-            <AnimatePresence mode="wait">
-              {!overviewHidden && (
-                <motion.div
-                  key="overview"
-                  initial={{ opacity: 1, height: 'auto' }}
-                  animate={{ opacity: overviewVisible ? 1 : 0 }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.4 }}
-                  onAnimationComplete={() => {
-                    // Only transition to subservicesReveal after fade-out completes
-                    if (phase === 'mainFadeOut' && !overviewVisible) {
-                      setPhase('subservicesReveal')
-                    }
-                  }}
-                  className="mb-6 overflow-hidden"
-                >
-                  <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
-                  <p className="text-sm md:text-base text-foreground/80 leading-relaxed font-sans">
-                    {phase === 'done' ? serviceData.main : typedMain}
-                    {phase !== 'done' && typedMain.length < serviceData.main.length && <span className="animate-pulse">|</span>}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* OVERVIEW Section - Shows until overviewFadeOut phase, then hidden until done */}
+            <motion.div
+              initial={{ opacity: 1 }}
+              animate={{ 
+                opacity: (phase === 'overviewFadeOut' || phase === 'waitBeforeServices' || phase === 'servicesAppear' || phase === 'waitBeforeFinal') ? 0 : 1
+              }}
+              transition={{ duration: 0.5 }}
+              className="mb-6"
+              style={{
+                display: (phase === 'overviewFadeOut' || phase === 'waitBeforeServices' || phase === 'servicesAppear' || phase === 'waitBeforeFinal') ? 'none' : 'block'
+              }}
+            >
+              <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
+              <p className="text-sm md:text-base text-foreground/80 leading-relaxed font-sans">
+                {typedMain}
+                {phase !== 'mainTyping' && phase !== 'waitBeforeFade' && typedMain.length < serviceData.main.length && <span className="animate-pulse">|</span>}
+              </p>
+            </motion.div>
 
-            {/* Services Breakdown - Clean fade in and slide up after OVERVIEW is removed */}
-            <AnimatePresence>
-              {(phase === 'subservicesReveal' || phase === 'done') && (
-                <motion.div
-                  key="services"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                >
-                  <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">
-                    Services Included ({serviceData.subDescriptions.length})
-                  </p>
-                  
-                  <div className="space-y-2 mb-8">
-                    {serviceData.subDescriptions.map((desc, idx) => (
-                      <motion.button
-                        key={idx}
-                        onClick={() => handleSubServiceClick(idx)}
-                        className="w-full group relative flex items-start gap-3 p-3 rounded-lg transition-all cursor-pointer"
-                        style={{
-                          backgroundColor: expandedSubIndex === idx ? 'var(--card)' : 'transparent',
-                          border: expandedSubIndex === idx ? '1px solid var(--border)' : '1px solid var(--border)',
-                        }}
-                        whileHover={{ backgroundColor: 'var(--card)', scale: 1.02 }}
-                      >
-                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-foreground/10 text-foreground flex items-center justify-center text-xs font-semibold">
-                          {idx + 1}
-                        </div>
-                        <div className="flex-1 text-left">
-                          <p className="text-sm font-semibold text-foreground">{service.subServices[idx]}</p>
-                          <AnimatePresence>
-                            {expandedSubIndex === idx && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.35 }}
-                                className="overflow-hidden mt-2"
-                              >
-                                <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pl-8 border-l border-border font-sans">
-                                  {typedSubDescriptions[idx] || ''}
-                                  {typedSubDescriptions[idx] && typedSubDescriptions[idx].length < (serviceData.subDescriptions[idx] || '').length && (
-                                    <span className="animate-pulse">|</span>
-                                  )}
-                                </p>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                        <motion.div
-                          animate={{ rotate: expandedSubIndex === idx ? 45 : 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="flex-shrink-0 text-muted-foreground group-hover:text-foreground"
-                        >
-                          +
-                        </motion.div>
-                      </motion.button>
-                    ))}
-                  </div>
-
-                  {/* CTA Button */}
-                  <motion.div
-                    initial={{ y: 15, opacity: 0, scale: 0.95 }}
-                    animate={{ y: 0, opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
+            {/* Services Breakdown - Appears during servicesAppear and done phases */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ 
+                opacity: (phase === 'servicesAppear' || phase === 'waitBeforeFinal' || phase === 'done') ? 1 : 0,
+                y: (phase === 'servicesAppear' || phase === 'waitBeforeFinal' || phase === 'done') ? 0 : 30
+              }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            >
+              <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">
+                Services Included ({serviceData.subDescriptions.length})
+              </p>
+              
+              <div className="space-y-2 mb-8">
+                {serviceData.subDescriptions.map((desc, idx) => (
+                  <motion.button
+                    key={idx}
+                    onClick={() => handleSubServiceClick(idx)}
+                    className="w-full group relative flex items-start gap-3 p-3 rounded-lg transition-all cursor-pointer"
+                    style={{
+                      backgroundColor: expandedSubIndex === idx ? 'var(--card)' : 'transparent',
+                      border: expandedSubIndex === idx ? '1px solid var(--border)' : '1px solid var(--border)',
+                    }}
+                    whileHover={{ backgroundColor: 'var(--card)', scale: 1.02 }}
                   >
-                    <Link
-                      href="/contact"
-                      className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all hover:shadow-lg"
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-foreground/10 text-foreground flex items-center justify-center text-xs font-semibold">
+                      {idx + 1}
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="text-sm font-semibold text-foreground">{service.subServices[idx]}</p>
+                      <AnimatePresence>
+                        {expandedSubIndex === idx && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.35 }}
+                            className="overflow-hidden mt-2"
+                          >
+                            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pl-8 border-l border-border font-sans">
+                              {typedSubDescriptions[idx] || ''}
+                              {typedSubDescriptions[idx] && typedSubDescriptions[idx].length < (serviceData.subDescriptions[idx] || '').length && (
+                                <span className="animate-pulse">|</span>
+                              )}
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    <motion.div
+                      animate={{ rotate: expandedSubIndex === idx ? 45 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex-shrink-0 text-muted-foreground group-hover:text-foreground"
                     >
-                      Get This Service
-                    </Link>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      +
+                    </motion.div>
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* CTA Button */}
+              <motion.div
+                initial={{ y: 15, opacity: 0, scale: 0.95 }}
+                animate={{ y: 0, opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, duration: 0.4, ease: 'easeOut' }}
+              >
+                <Link
+                  href="/contact"
+                  className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all hover:shadow-lg"
+                >
+                  Get This Service
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            {/* OVERVIEW Returns in Final Phase */}
+            {phase === 'done' && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="mt-8 pt-6 border-t border-border"
+              >
+                <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
+                <p className="text-sm md:text-base text-foreground/80 leading-relaxed font-sans">
+                  {serviceData.main}
+                </p>
+              </motion.div>
+            )}
           </motion.div>
         </div>
 
