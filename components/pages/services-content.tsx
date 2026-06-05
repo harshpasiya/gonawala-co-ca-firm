@@ -173,140 +173,26 @@ function ServiceCard({ service, onClick }: { service: typeof allServices[0]; onC
 }
 
 function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onClose }: any) {
-  const [typedMain, setTypedMain] = useState('')
-  const [typedSubDescriptions, setTypedSubDescriptions] = useState<Record<number, string>>({})
   const [expandedSubIndex, setExpandedSubIndex] = useState<number | null>(null)
-  const [animationState, setAnimationState] = useState<'typing' | 'scrolling' | 'done'>('typing')
-  const [overviewHeight, setOverviewHeight] = useState<number | 'auto'>('auto')
-  const [servicesOpacity, setServicesOpacity] = useState(0)
-  
-  // Timer refs
-  const mainTyperRef = useRef<NodeJS.Timeout | null>(null)
-  const subDescTyperRef = useRef<NodeJS.Timeout | null>(null)
-  const scrollTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const overviewRef = useRef<HTMLDivElement>(null)
   
   const serviceData = mainServiceDescriptions[service.id] || { main: service.description, subDescriptions: service.subServices }
 
-  const resetAll = () => {
-    if (mainTyperRef.current) clearInterval(mainTyperRef.current)
-    if (subDescTyperRef.current) clearInterval(subDescTyperRef.current)
-    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current)
-    setTypedMain('')
-    setTypedSubDescriptions({})
-    setExpandedSubIndex(null)
-    setAnimationState('typing')
-    setOverviewHeight('auto')
-    setServicesOpacity(0)
-  }
-
-  // Typewriter animation for main description
-  useEffect(() => {
-    if (animationState === 'typing') {
-      let charIdx = 0
-      mainTyperRef.current = setInterval(() => {
-        if (charIdx < serviceData.main.length) {
-          setTypedMain(serviceData.main.slice(0, ++charIdx))
-        } else {
-          if (mainTyperRef.current) clearInterval(mainTyperRef.current)
-          // After typing completes, wait 1.5 seconds then start scrolling animation
-          scrollTimerRef.current = setTimeout(() => {
-            setAnimationState('scrolling')
-          }, 1500)
-        }
-      }, 8)
-    }
-    return () => {
-      if (mainTyperRef.current) clearInterval(mainTyperRef.current)
-    }
-  }, [animationState, serviceData.main])
-
-  // Scrolling effect animation: collapse overview, show services, fade back to done
-  useEffect(() => {
-    if (animationState === 'scrolling') {
-      // Phase 1: Collapse overview (2000ms)
-      let progress = 0
-      const collapseInterval = setInterval(() => {
-        progress += 1
-        const heightPercent = Math.max(0, 100 - progress * (100 / 50)) // Collapse over 50 steps (2000ms)
-        if (overviewRef.current) {
-          const fullHeight = 120
-          setOverviewHeight(Math.max(0, (fullHeight * heightPercent) / 100))
-        }
-        
-        // Show services after halfway through collapse
-        if (progress > 25) {
-          setServicesOpacity(Math.min(1, (progress - 25) / 25))
-        }
-        
-        if (progress >= 50) {
-          clearInterval(collapseInterval)
-          // After collapse animation, set to done state
-          scrollTimerRef.current = setTimeout(() => {
-            setAnimationState('done')
-            setOverviewHeight('auto')
-          }, 1000)
-        }
-      }, 40)
-    }
-    return () => {
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current)
-    }
-  }, [animationState])
-
-  // Handle subservice expand/collapse with typewriter (8ms per character)
   const handleSubServiceClick = (idx: number) => {
-    if (expandedSubIndex === idx) {
-      setExpandedSubIndex(null)
-      setTypedSubDescriptions(prev => {
-        const updated = { ...prev }
-        delete updated[idx]
-        return updated
-      })
-      if (subDescTyperRef.current) clearInterval(subDescTyperRef.current)
-    } else {
-      setExpandedSubIndex(idx)
-      setTypedSubDescriptions(prev => {
-        const updated = { ...prev }
-        updated[idx] = ''
-        return updated
-      })
-      
-      // Type out the description (8ms per character)
-      const desc = serviceData.subDescriptions[idx] || ''
-      let charIdx = 0
-      if (subDescTyperRef.current) clearInterval(subDescTyperRef.current)
-      
-      subDescTyperRef.current = setInterval(() => {
-        if (charIdx < desc.length) {
-          setTypedSubDescriptions(prev => ({
-            ...prev,
-            [idx]: desc.slice(0, ++charIdx)
-          }))
-        } else {
-          if (subDescTyperRef.current) clearInterval(subDescTyperRef.current)
-        }
-      }, 8)
-    }
+    setExpandedSubIndex(expandedSubIndex === idx ? null : idx)
   }
 
   const handleSkip = () => {
-    resetAll()
-    setAnimationState('done')
-    setTypedMain(serviceData.main)
-    setServicesOpacity(1)
-    setOverviewHeight('auto')
+    // No animation to skip
   }
 
   useEffect(() => {
     return () => {
-      resetAll()
+      setExpandedSubIndex(null)
     }
   }, [service.id])
 
-  // Progress calculation based on animation state
-  const progress = animationState === 'done' ? 100 : 
-                   animationState === 'scrolling' ? 50 : 30
+  // Progress is always 100 (no animation)
+  const progress = 100
 
   return (
     <motion.div
@@ -371,121 +257,79 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
           </motion.div>
 
           {/* Right Panel - Content */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-y-auto p-5 md:p-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border"
+          <div
+            className="overflow-y-auto px-6 md:px-8 py-6 space-y-6 md:space-y-8"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {/* OVERVIEW Section - Collapses with scrolling effect */}
-            <motion.div
-              ref={overviewRef}
-              initial={{ height: 'auto' }}
-              animate={{ height: overviewHeight === 'auto' ? 'auto' : overviewHeight }}
-              transition={{ duration: 0.05 }}
-              className="mb-6 overflow-hidden"
-            >
+            <style>{`
+              div::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+
+            {/* OVERVIEW Section */}
+            <div>
               <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
               <p className="text-sm md:text-base text-foreground/80 leading-relaxed font-sans">
-                {typedMain}
-                {animationState === 'typing' && typedMain.length < serviceData.main.length && <span className="animate-pulse">|</span>}
+                {serviceData.main}
               </p>
-            </motion.div>
+            </div>
 
-            {/* Services Breakdown - Fades in as overview collapses */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: servicesOpacity }}
-              transition={{ duration: 0.05 }}
-            >
+            {/* Services Breakdown */}
+            <div>
               <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">
                 Services Included ({serviceData.subDescriptions.length})
               </p>
               
               <div className="space-y-2 mb-8">
                 {serviceData.subDescriptions.map((desc, idx) => (
-                  <motion.button
+                  <button
                     key={idx}
                     onClick={() => handleSubServiceClick(idx)}
-                    className="w-full group relative flex items-start gap-3 p-3 rounded-lg transition-all cursor-pointer"
+                    className="w-full group relative flex items-start gap-3 p-3 rounded-lg transition-all cursor-pointer hover:bg-card"
                     style={{
                       backgroundColor: expandedSubIndex === idx ? 'var(--card)' : 'transparent',
                       border: expandedSubIndex === idx ? '1px solid var(--border)' : '1px solid var(--border)',
                     }}
-                    whileHover={{ backgroundColor: 'var(--card)', scale: 1.02 }}
                   >
                     <div className="flex-shrink-0 w-6 h-6 rounded-full bg-foreground/10 text-foreground flex items-center justify-center text-xs font-semibold">
                       {idx + 1}
                     </div>
                     <div className="flex-1 text-left">
                       <p className="text-sm font-semibold text-foreground">{service.subServices[idx]}</p>
-                      <AnimatePresence>
-                        {expandedSubIndex === idx && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.35 }}
-                            className="overflow-hidden mt-2"
-                          >
-                            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pl-8 border-l border-border font-sans">
-                              {typedSubDescriptions[idx] || ''}
-                              {typedSubDescriptions[idx] && typedSubDescriptions[idx].length < (serviceData.subDescriptions[idx] || '').length && (
-                                <span className="animate-pulse">|</span>
-                              )}
-                            </p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      {expandedSubIndex === idx && (
+                        <div className="mt-2">
+                          <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pl-8 border-l border-border font-sans">
+                            {desc}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    <motion.div
-                      animate={{ rotate: expandedSubIndex === idx ? 45 : 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="flex-shrink-0 text-muted-foreground group-hover:text-foreground"
+                    <div
+                      className="flex-shrink-0 text-muted-foreground group-hover:text-foreground transition-transform"
+                      style={{
+                        transform: expandedSubIndex === idx ? 'rotate(45deg)' : 'rotate(0deg)',
+                      }}
                     >
                       +
-                    </motion.div>
-                  </motion.button>
+                    </div>
+                  </button>
                 ))}
               </div>
 
               {/* CTA Button */}
-              <motion.div
-                initial={{ y: 15, opacity: 0, scale: 0.95 }}
-                animate={{ y: 0, opacity: servicesOpacity, scale: 1 }}
-                transition={{ delay: 0.2, duration: 0.4, ease: 'easeOut' }}
+              <Link
+                href="/contact"
+                className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all hover:shadow-lg"
               >
-                <Link
-                  href="/contact"
-                  className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all hover:shadow-lg"
-                >
-                  Get This Service
-                </Link>
-              </motion.div>
-            </motion.div>
-
-            {/* OVERVIEW Returns at bottom in final state */}
-            {animationState === 'done' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="mt-8 pt-6 border-t border-border"
-              >
-                <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
-                <p className="text-sm md:text-base text-foreground/80 leading-relaxed font-sans">
-                  {serviceData.main}
-                </p>
-              </motion.div>
-            )}
-          </motion.div>
+                Get This Service
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}
         <div className="border-t border-border px-6 md:px-8 py-3 md:py-4 flex justify-between items-center gap-4 flex-wrap text-sm">
-          <button onClick={handleSkip} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-            Skip Animation
-          </button>
           <span className="text-xs text-foreground/50">{currentIndex + 1} of {totalServices}</span>
           <div className="flex gap-2">
             <button onClick={onPrev} className="p-2 hover:bg-foreground/5 rounded transition-colors">
