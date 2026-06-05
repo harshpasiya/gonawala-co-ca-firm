@@ -267,25 +267,36 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
               }
             `}</style>
 
-            {/* OVERVIEW Section */}
-            <div>
+            {/* OVERVIEW Section - Fade in with slide up */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            >
               <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
               <p className="text-sm md:text-base text-foreground/80 leading-relaxed font-sans">
                 {serviceData.main}
               </p>
-            </div>
+            </motion.div>
 
-            {/* Services Breakdown */}
-            <div>
+            {/* Services Breakdown - Staggered entrance */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">
                 Services Included ({serviceData.subDescriptions.length})
               </p>
               
               <div className="space-y-2 mb-8">
                 {serviceData.subDescriptions.map((desc, idx) => (
-                  <button
+                  <motion.button
                     key={idx}
                     onClick={() => handleSubServiceClick(idx)}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.25 + idx * 0.1, ease: 'easeOut' }}
                     className="w-full group relative flex items-start gap-3 p-3 rounded-lg transition-all cursor-pointer hover:bg-card"
                     style={{
                       backgroundColor: expandedSubIndex === idx ? 'var(--card)' : 'transparent',
@@ -297,34 +308,47 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
                     </div>
                     <div className="flex-1 text-left">
                       <p className="text-sm font-semibold text-foreground">{service.subServices[idx]}</p>
-                      {expandedSubIndex === idx && (
-                        <div className="mt-2">
-                          <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pl-8 border-l border-border font-sans">
-                            {desc}
-                          </p>
-                        </div>
-                      )}
+                      <AnimatePresence>
+                        {expandedSubIndex === idx && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            className="overflow-hidden mt-2"
+                          >
+                            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pl-8 border-l border-border font-sans">
+                              {desc}
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                    <div
-                      className="flex-shrink-0 text-muted-foreground group-hover:text-foreground transition-transform"
-                      style={{
-                        transform: expandedSubIndex === idx ? 'rotate(45deg)' : 'rotate(0deg)',
-                      }}
+                    <motion.div
+                      animate={{ rotate: expandedSubIndex === idx ? 45 : 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="flex-shrink-0 text-muted-foreground group-hover:text-foreground"
                     >
                       +
-                    </div>
-                  </button>
+                    </motion.div>
+                  </motion.button>
                 ))}
               </div>
 
-              {/* CTA Button */}
-              <Link
-                href="/contact"
-                className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all hover:shadow-lg"
+              {/* CTA Button - Fade in with scale */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 + serviceData.subDescriptions.length * 0.1, ease: 'easeOut' }}
               >
-                Get This Service
-              </Link>
-            </div>
+                <Link
+                  href="/contact"
+                  className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all hover:shadow-lg"
+                >
+                  Get This Service
+                </Link>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
 
