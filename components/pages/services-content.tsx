@@ -173,134 +173,86 @@ function ServiceCard({ service, onClick }: { service: typeof allServices[0]; onC
 }
 
 function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onClose }: any) {
-  const [phase, setPhase] = useState<'headingIn' | 'mainTyping' | 'waitBeforeFade' | 'overviewFadeOut' | 'waitBeforeServices' | 'servicesAppear' | 'waitBeforeFinal' | 'done'>('headingIn')
   const [typedMain, setTypedMain] = useState('')
   const [typedSubDescriptions, setTypedSubDescriptions] = useState<Record<number, string>>({})
   const [expandedSubIndex, setExpandedSubIndex] = useState<number | null>(null)
-  const [showServices, setShowServices] = useState(false)
-  const [showOverviewFinal, setShowOverviewFinal] = useState(false)
+  const [animationState, setAnimationState] = useState<'typing' | 'scrolling' | 'done'>('typing')
+  const [overviewHeight, setOverviewHeight] = useState<number | 'auto'>('auto')
+  const [servicesOpacity, setServicesOpacity] = useState(0)
   
-  // Timer refs for all intervals and timeouts
+  // Timer refs
   const mainTyperRef = useRef<NodeJS.Timeout | null>(null)
   const subDescTyperRef = useRef<NodeJS.Timeout | null>(null)
-  const phaseTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const scrollTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const overviewRef = useRef<HTMLDivElement>(null)
   
   const serviceData = mainServiceDescriptions[service.id] || { main: service.description, subDescriptions: service.subServices }
 
   const resetAll = () => {
     if (mainTyperRef.current) clearInterval(mainTyperRef.current)
     if (subDescTyperRef.current) clearInterval(subDescTyperRef.current)
-    if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
-    setPhase('headingIn')
+    if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current)
     setTypedMain('')
     setTypedSubDescriptions({})
     setExpandedSubIndex(null)
-    setShowServices(false)
-    setShowOverviewFinal(false)
+    setAnimationState('typing')
+    setOverviewHeight('auto')
+    setServicesOpacity(0)
   }
 
-  // Phase 1: Heading animation (500ms) -> Phase 2
+  // Typewriter animation for main description
   useEffect(() => {
-    if (phase === 'headingIn') {
-      phaseTimerRef.current = setTimeout(() => {
-        setPhase('mainTyping')
-      }, 500)
-    }
-    return () => {
-      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
-    }
-  }, [phase])
-
-  // Phase 2: Main description typewriter (8ms per char) -> Phase 3 (wait 2 seconds)
-  useEffect(() => {
-    if (phase === 'mainTyping') {
+    if (animationState === 'typing') {
       let charIdx = 0
       mainTyperRef.current = setInterval(() => {
         if (charIdx < serviceData.main.length) {
           setTypedMain(serviceData.main.slice(0, ++charIdx))
         } else {
           if (mainTyperRef.current) clearInterval(mainTyperRef.current)
-          phaseTimerRef.current = setTimeout(() => {
-            setPhase('waitBeforeFade')
-          }, 2000)
+          // After typing completes, wait 1.5 seconds then start scrolling animation
+          scrollTimerRef.current = setTimeout(() => {
+            setAnimationState('scrolling')
+          }, 1500)
         }
       }, 8)
     }
     return () => {
       if (mainTyperRef.current) clearInterval(mainTyperRef.current)
     }
-  }, [phase, serviceData.main])
+  }, [animationState, serviceData.main])
 
-  // Phase 3: Wait 2 seconds before fading out OVERVIEW
+  // Scrolling effect animation: collapse overview, show services, fade back to done
   useEffect(() => {
-    if (phase === 'waitBeforeFade') {
-      phaseTimerRef.current = setTimeout(() => {
-        setPhase('overviewFadeOut')
-      }, 2000)
+    if (animationState === 'scrolling') {
+      // Phase 1: Collapse overview (2000ms)
+      let progress = 0
+      const collapseInterval = setInterval(() => {
+        progress += 1
+        const heightPercent = Math.max(0, 100 - progress * (100 / 50)) // Collapse over 50 steps (2000ms)
+        if (overviewRef.current) {
+          const fullHeight = 120
+          setOverviewHeight(Math.max(0, (fullHeight * heightPercent) / 100))
+        }
+        
+        // Show services after halfway through collapse
+        if (progress > 25) {
+          setServicesOpacity(Math.min(1, (progress - 25) / 25))
+        }
+        
+        if (progress >= 50) {
+          clearInterval(collapseInterval)
+          // After collapse animation, set to done state
+          scrollTimerRef.current = setTimeout(() => {
+            setAnimationState('done')
+            setOverviewHeight('auto')
+          }, 1000)
+        }
+      }, 40)
     }
     return () => {
-      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current)
     }
-  }, [phase])
-
-  // Phase 4: OVERVIEW fades out (500ms) -> Phase 5 (wait 2 seconds)
-  useEffect(() => {
-    if (phase === 'overviewFadeOut') {
-      phaseTimerRef.current = setTimeout(() => {
-        setPhase('waitBeforeServices')
-      }, 500)
-    }
-    return () => {
-      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
-    }
-  }, [phase])
-
-  // Phase 5: Wait 2 seconds before showing services
-  useEffect(() => {
-    if (phase === 'waitBeforeServices') {
-      phaseTimerRef.current = setTimeout(() => {
-        setPhase('servicesAppear')
-      }, 2000)
-    }
-    return () => {
-      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
-    }
-  }, [phase])
-
-  // Phase 6: Services appear (500ms fade in) -> Phase 7 (wait 2 seconds)
-  useEffect(() => {
-    if (phase === 'servicesAppear') {
-      setShowServices(true)
-      phaseTimerRef.current = setTimeout(() => {
-        setPhase('waitBeforeFinal')
-      }, 500)
-    }
-    return () => {
-      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
-    }
-  }, [phase])
-
-  // Phase 7: Wait 2 seconds before showing final state
-  useEffect(() => {
-    if (phase === 'waitBeforeFinal') {
-      phaseTimerRef.current = setTimeout(() => {
-        setPhase('done')
-      }, 2000)
-    }
-    return () => {
-      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
-    }
-  }, [phase])
-
-  // Phase 8: Done - show OVERVIEW and Services together
-  useEffect(() => {
-    if (phase === 'done') {
-      setShowOverviewFinal(true)
-    }
-    return () => {
-      if (phaseTimerRef.current) clearTimeout(phaseTimerRef.current)
-    }
-  }, [phase])
+  }, [animationState])
 
   // Handle subservice expand/collapse with typewriter (8ms per character)
   const handleSubServiceClick = (idx: number) => {
@@ -340,12 +292,10 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
 
   const handleSkip = () => {
     resetAll()
-    setPhase('done')
+    setAnimationState('done')
     setTypedMain(serviceData.main)
-    setShowServices(true)
-    setShowOverviewFinal(true)
-    setExpandedSubIndex(null)
-    setTypedSubDescriptions({})
+    setServicesOpacity(1)
+    setOverviewHeight('auto')
   }
 
   useEffect(() => {
@@ -354,14 +304,9 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
     }
   }, [service.id])
 
-  // Progress calculation: 8 phases
-  const progress = phase === 'done' ? 100 : 
-                   phase === 'waitBeforeFinal' ? 87.5 : 
-                   phase === 'servicesAppear' ? 75 : 
-                   phase === 'waitBeforeServices' ? 62.5 : 
-                   phase === 'overviewFadeOut' ? 50 : 
-                   phase === 'waitBeforeFade' ? 37.5 : 
-                   phase === 'mainTyping' ? 25 : 12.5
+  // Progress calculation based on animation state
+  const progress = animationState === 'done' ? 100 : 
+                   animationState === 'scrolling' ? 50 : 30
 
   return (
     <motion.div
@@ -432,33 +377,26 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
             transition={{ duration: 0.3 }}
             className="overflow-y-auto p-5 md:p-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border"
           >
-            {/* OVERVIEW Section - Shows until overviewFadeOut phase, then hidden until done */}
+            {/* OVERVIEW Section - Collapses with scrolling effect */}
             <motion.div
-              initial={{ opacity: 1 }}
-              animate={{ 
-                opacity: (phase === 'overviewFadeOut' || phase === 'waitBeforeServices' || phase === 'servicesAppear' || phase === 'waitBeforeFinal') ? 0 : 1
-              }}
-              transition={{ duration: 0.5 }}
-              className="mb-6"
-              style={{
-                display: (phase === 'overviewFadeOut' || phase === 'waitBeforeServices' || phase === 'servicesAppear' || phase === 'waitBeforeFinal') ? 'none' : 'block'
-              }}
+              ref={overviewRef}
+              initial={{ height: 'auto' }}
+              animate={{ height: overviewHeight === 'auto' ? 'auto' : overviewHeight }}
+              transition={{ duration: 0.05 }}
+              className="mb-6 overflow-hidden"
             >
               <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
               <p className="text-sm md:text-base text-foreground/80 leading-relaxed font-sans">
                 {typedMain}
-                {phase !== 'mainTyping' && phase !== 'waitBeforeFade' && typedMain.length < serviceData.main.length && <span className="animate-pulse">|</span>}
+                {animationState === 'typing' && typedMain.length < serviceData.main.length && <span className="animate-pulse">|</span>}
               </p>
             </motion.div>
 
-            {/* Services Breakdown - Appears during servicesAppear and done phases */}
+            {/* Services Breakdown - Fades in as overview collapses */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ 
-                opacity: (phase === 'servicesAppear' || phase === 'waitBeforeFinal' || phase === 'done') ? 1 : 0,
-                y: (phase === 'servicesAppear' || phase === 'waitBeforeFinal' || phase === 'done') ? 0 : 30
-              }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: servicesOpacity }}
+              transition={{ duration: 0.05 }}
             >
               <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">
                 Services Included ({serviceData.subDescriptions.length})
@@ -514,7 +452,7 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
               {/* CTA Button */}
               <motion.div
                 initial={{ y: 15, opacity: 0, scale: 0.95 }}
-                animate={{ y: 0, opacity: 1, scale: 1 }}
+                animate={{ y: 0, opacity: servicesOpacity, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.4, ease: 'easeOut' }}
               >
                 <Link
@@ -526,12 +464,12 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
               </motion.div>
             </motion.div>
 
-            {/* OVERVIEW Returns in Final Phase */}
-            {phase === 'done' && (
+            {/* OVERVIEW Returns at bottom in final state */}
+            {animationState === 'done' && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
                 className="mt-8 pt-6 border-t border-border"
               >
                 <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
