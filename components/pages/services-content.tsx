@@ -368,7 +368,462 @@ function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onC
     </motion.div>
   )
 }
-
+// ─────────────────────────────────────────────
+// 1. SERVICES PAGE HERO
+// Frames the services page — what we offer, who it's for
+// ─────────────────────────────────────────────
+function ServicesHero() {
+  const categories = [
+    { label: 'Core Services', count: 6, desc: 'Accounting, Audit, Tax, GST, Corporate Law, Financial Advisory' },
+    { label: 'Specialized Services', count: 5, desc: 'Loans, Insolvency, Startup Advisory, Payroll, Certifications' },
+    { label: 'International Services', count: 7, desc: 'NRI Tax, FEMA, RBI Filings, Transfer Pricing, DTAA, Foreign Assets' },
+  ]
+ 
+  return (
+    <section className="relative bg-background border-b border-border overflow-hidden pt-20 pb-0">
+      {/* Subtle dot grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(circle, var(--border) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+          opacity: 0.6,
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'linear-gradient(to bottom, transparent 60%, var(--background) 100%)',
+        }}
+      />
+ 
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumb */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center gap-2 mb-8"
+        >
+          <span className="text-xs text-muted-foreground">Home</span>
+          <span className="text-xs text-muted-foreground">/</span>
+          <span className="text-xs text-foreground font-medium">Services</span>
+        </motion.div>
+ 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-end pb-16">
+          {/* Left: heading */}
+          <div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.05 }}
+              className="flex items-center gap-3 mb-6"
+            >
+              <div className="h-px w-8 bg-foreground/50" />
+              <span className="text-xs uppercase tracking-[0.22em] text-muted-foreground font-semibold">
+                18 Services · 3 Practice Areas
+              </span>
+            </motion.div>
+ 
+            <div className="overflow-hidden mb-4">
+              <motion.h1
+                initial={{ y: 60, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+                className="font-bold text-foreground leading-[0.95] tracking-tight"
+                style={{ fontSize: 'clamp(40px, 7vw, 88px)', fontFamily: 'Poppins, sans-serif' }}
+              >
+                Everything
+              </motion.h1>
+            </div>
+            <div className="overflow-hidden mb-4">
+              <motion.h1
+                initial={{ y: 60, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.75, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+                className="font-bold text-foreground leading-[0.95] tracking-tight"
+                style={{ fontSize: 'clamp(40px, 7vw, 88px)', fontFamily: 'Poppins, sans-serif' }}
+              >
+                your business
+              </motion.h1>
+            </div>
+            <div className="overflow-hidden">
+              <motion.h1
+                initial={{ y: 60, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.75, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                className="font-bold leading-[0.95] tracking-tight"
+                style={{
+                  fontSize: 'clamp(40px, 7vw, 88px)',
+                  fontFamily: 'Poppins, sans-serif',
+                  color: 'var(--muted-foreground)',
+                }}
+              >
+                financially needs.
+              </motion.h1>
+            </div>
+          </div>
+ 
+          {/* Right: description + quick-jump anchors */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.25 }}
+            className="flex flex-col gap-6 pb-2"
+          >
+            <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+              From day-to-day bookkeeping to complex cross-border investment structuring — our 18 service offerings are organised into three practice areas. Click any service below to explore in detail.
+            </p>
+ 
+            {/* Category pills */}
+            <div className="flex flex-col gap-3">
+              {categories.map((cat, i) => (
+                <motion.div
+                  key={cat.label}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.35 + i * 0.1 }}
+                  className="flex items-start gap-4 p-4 rounded-xl border border-border bg-card"
+                >
+                  <div
+                    className="flex-shrink-0 w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-bold"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    {cat.count}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground mb-0.5">{cat.label}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{cat.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+ 
+        {/* Bottom ticker strip */}
+        <div className="border-t border-border py-4 overflow-hidden">
+          <motion.div
+            animate={{ x: ['0%', '-50%'] }}
+            transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+            className="flex gap-12 whitespace-nowrap w-max"
+          >
+            {[
+              'Accounting', 'GST', 'Income Tax', 'Statutory Audit',
+              'Company Incorporation', 'Transfer Pricing', 'NRI Advisory',
+              'FEMA Compliance', 'RBI Filings', 'Payroll', 'IBC Advisory',
+              'Financial Planning', 'Certification', 'DTAA Advisory',
+              'Accounting', 'GST', 'Income Tax', 'Statutory Audit',
+              'Company Incorporation', 'Transfer Pricing', 'NRI Advisory',
+              'FEMA Compliance', 'RBI Filings', 'Payroll', 'IBC Advisory',
+              'Financial Planning', 'Certification', 'DTAA Advisory',
+            ].map((item, i) => (
+              <span key={i} className="text-xs uppercase tracking-widest text-muted-foreground/50 font-medium">
+                {item}
+                <span className="ml-12 text-border">·</span>
+              </span>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  )
+}
+ 
+// ─────────────────────────────────────────────
+// 2. APPROACH STRIP (between hero and services grid)
+// Short contextual bar: how we handle every service engagement
+// ─────────────────────────────────────────────
+function ApproachStrip() {
+  const points = [
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke="var(--foreground)" strokeWidth="1.5"/>
+          <path d="M12 7v5l3 3" stroke="var(--foreground)" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+      ),
+      heading: 'Deadline-first mindset',
+      body: 'Every service engagement begins with a deadline map. Nothing is filed late.',
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="18" height="18" rx="2" stroke="var(--foreground)" strokeWidth="1.5"/>
+          <path d="M8 12h8M8 8h5M8 16h3" stroke="var(--foreground)" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+      ),
+      heading: 'Fixed-fee transparency',
+      body: 'Every service is scoped and priced upfront. No surprise invoices, ever.',
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="var(--foreground)" strokeWidth="1.5" strokeLinecap="round"/>
+          <circle cx="9" cy="7" r="4" stroke="var(--foreground)" strokeWidth="1.5"/>
+          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="var(--foreground)" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+      ),
+      heading: 'Dedicated relationship manager',
+      body: 'One point of contact coordinates every specialist working on your account.',
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="var(--foreground)" strokeWidth="1.5" strokeLinejoin="round"/>
+        </svg>
+      ),
+      heading: 'Regulatory-grade accuracy',
+      body: 'Multi-stage review on every filing before it leaves our office.',
+    },
+  ]
+ 
+  return (
+    <section className="bg-card border-b border-border py-10 md:py-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {points.map((p, i) => (
+            <motion.div
+              key={p.heading}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="flex gap-4 items-start"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg border border-border bg-background flex items-center justify-center">
+                {p.icon}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground mb-1">{p.heading}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{p.body}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+ 
+// ─────────────────────────────────────────────
+// 3. BELOW SERVICES: FAQ (service-specific)
+// ─────────────────────────────────────────────
+function ServicesFAQ() {
+  const faqs = [
+    {
+      q: 'Do I need all 18 services or can I engage for just one?',
+      a: 'Completely your choice. Every service is available as a standalone engagement with its own fixed-fee proposal. Many clients start with a single service — typically tax filing or GST compliance — and expand the relationship over time.',
+    },
+    {
+      q: 'How quickly can you onboard a new client?',
+      a: 'For most services, we can begin within 3–5 working days of receiving the engagement letter and initial documents. Complex mandates like transfer pricing or insolvency proceedings are scoped and started within 7–10 days.',
+    },
+    {
+      q: 'What is the difference between your Core and Specialized services?',
+      a: 'Core services (accounting, audit, tax, GST, corporate law, financial advisory) are applicable to nearly every business regardless of size or sector. Specialized services address specific situations — a startup raising funds, an employer managing payroll compliance, or a company facing insolvency.',
+    },
+    {
+      q: 'I am an NRI. Which services are most relevant to me?',
+      a: 'The International practice area is built for NRIs — covering residential status determination, NRI income tax returns, DTAA benefits, FEMA compliance for NRE/NRO accounts, and foreign asset disclosure. Many NRI clients also require Certification Services for remittances and Form 15CB.',
+    },
+    {
+      q: 'Can you handle a company that has operations both in India and abroad?',
+      a: 'Yes — this is a core strength. We handle the Indian side of cross-border structures including transfer pricing documentation, RBI filings (FDI, ODI, ECB), FEMA compliance, and international tax advisory under DTAA. For foreign jurisdiction requirements, we coordinate with our overseas network partners.',
+    },
+    {
+      q: 'Are your fees fixed or do they vary with the complexity of the work?',
+      a: 'We offer fixed-fee engagements wherever possible. For straightforward mandates (e.g., ITR filing, GST returns, company incorporation), fees are fixed. For variable-complexity work like forensic audits, M&A due diligence, or IBC proceedings, we agree on a capped fee range upfront before any work begins.',
+    },
+  ]
+ 
+  const [open, setOpen] = useState<number | null>(null)
+ 
+  return (
+    <section className="py-20 md:py-28 bg-background border-t border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-12 lg:gap-20">
+          {/* Left: sticky heading */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="lg:sticky lg:top-24 self-start"
+          >
+            <div className="flex items-center gap-3 mb-5">
+              <div className="h-px w-8 bg-foreground/50" />
+              <span className="text-xs uppercase tracking-[0.22em] text-muted-foreground font-semibold">FAQ</span>
+            </div>
+            <h2
+              className="font-bold text-foreground leading-tight mb-6"
+              style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontFamily: 'Poppins, sans-serif' }}
+            >
+              Common questions about our services.
+            </h2>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-8">
+              If your question isn't answered here, reach out directly — we respond to every enquiry within one business day.
+            </p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 px-5 py-3 border border-border text-foreground rounded-lg text-sm font-semibold hover:bg-muted hover:border-foreground transition-all"
+            >
+              Ask a Question →
+            </Link>
+          </motion.div>
+ 
+          {/* Right: accordion */}
+          <div className="flex flex-col gap-2">
+            {faqs.map((faq, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.07 }}
+                className="border border-border rounded-xl overflow-hidden"
+                style={{ backgroundColor: open === i ? 'var(--card)' : 'transparent' }}
+              >
+                <button
+                  onClick={() => setOpen(open === i ? null : i)}
+                  className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left transition-colors"
+                >
+                  <span className="text-sm font-semibold text-foreground leading-snug">{faq.q}</span>
+                  <motion.span
+                    animate={{ rotate: open === i ? 45 : 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="flex-shrink-0 text-lg text-muted-foreground leading-none"
+                  >
+                    +
+                  </motion.span>
+                </button>
+                <AnimatePresence>
+                  {open === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.32, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <p className="px-5 pb-5 text-sm text-muted-foreground leading-relaxed border-t border-border pt-3">
+                        {faq.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+ 
+// ─────────────────────────────────────────────
+// 4. FINAL CTA — services-specific
+// ─────────────────────────────────────────────
+function ServicesPageCTA() {
+  const engagements = [
+    { label: 'First filing within', value: '5 days', sub: 'of onboarding' },
+    { label: 'Response time', value: '< 24h', sub: 'on every query' },
+    { label: 'Compliance rate', value: '100%', sub: 'on-time filings' },
+  ]
+ 
+  return (
+    <section className="bg-foreground py-16 md:py-20 overflow-hidden relative">
+      {/* Faint grid on dark bg */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(var(--background) 1px, transparent 1px),
+            linear-gradient(90deg, var(--background) 1px, transparent 1px)
+          `,
+          backgroundSize: '48px 48px',
+          opacity: 0.04,
+        }}
+      />
+ 
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Left */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65 }}
+          >
+            <h2
+              className="font-bold leading-tight mb-5"
+              style={{
+                fontSize: 'clamp(28px, 4vw, 52px)',
+                fontFamily: 'Poppins, sans-serif',
+                color: 'var(--background)',
+              }}
+            >
+              Not sure which service<br />you need? Let us assess.
+            </h2>
+            <p className="text-sm md:text-base leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              Book a 30-minute diagnostic call. We'll review your current compliance setup, identify gaps, and recommend exactly which services apply — at no charge.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/contact"
+                className="px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
+                style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+              >
+                Book Free Diagnostic
+              </Link>
+              <a
+                href="mailto:hello@cafirm.in"
+                className="px-6 py-3 rounded-xl text-sm font-semibold border transition-all"
+                style={{
+                  borderColor: 'rgba(255,255,255,0.2)',
+                  color: 'var(--background)',
+                }}
+              >
+                Email Us →
+              </a>
+            </div>
+          </motion.div>
+ 
+          {/* Right: stat cards */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65, delay: 0.15 }}
+            className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3 gap-4"
+          >
+            {engagements.map((e, i) => (
+              <motion.div
+                key={e.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.25 + i * 0.1 }}
+                className="rounded-xl p-5 flex flex-col gap-1"
+                style={{ backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+              >
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>{e.label}</span>
+                <span
+                  className="font-bold"
+                  style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontFamily: 'Poppins, sans-serif', color: 'var(--background)', lineHeight: 1.1 }}
+                >
+                  {e.value}
+                </span>
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{e.sub}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  )
+}
+ 
 export function ServicesContent() {
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null)
   const [activeFilter, setActiveFilter] = useState<'All' | 'Core' | 'Specialized' | 'International'>('All')
@@ -395,6 +850,8 @@ export function ServicesContent() {
 
   return (
     <>
+    <ServicesHero />
+    <ApproachStrip />
       <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-12">
@@ -457,6 +914,8 @@ export function ServicesContent() {
           />
         )}
       </AnimatePresence>
+      <ServicesFAQ />
+    <ServicesPageCTA />
     </>
   )
 }
