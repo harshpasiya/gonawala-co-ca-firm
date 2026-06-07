@@ -726,7 +726,7 @@ function ValuesSection() {
     {
       number: '01',
       title: 'Integrity before convenience',
-      body: 'We will tell you something you don\'t want to hear before we file something that\'s technically correct but strategically wrong. Our reputation is measured in decades, not engagements.',
+      body: "We will tell you something you don't want to hear before we file something that's technically correct but strategically wrong. Our reputation is measured in decades, not engagements.",
     },
     {
       number: '02',
@@ -736,14 +736,16 @@ function ValuesSection() {
     {
       number: '03',
       title: 'Clarity over jargon',
-      body: 'If you leave a meeting with us not understanding exactly what we said and why, we have failed. Financial complexity is our problem to solve, not yours to decode.',
+      body: "If you leave a meeting with us not understanding exactly what we said and why, we have failed. Financial complexity is our problem to solve, not yours to decode.",
     },
     {
       number: '04',
       title: 'Relationships over transactions',
-      body: 'The best advice we\'ve ever given clients wasn\'t billable. It was in a five-minute phone call that prevented a bad decision. That\'s the kind of practice we run.',
+      body: "The best advice we've ever given clients wasn't billable. It was in a five-minute phone call that prevented a bad decision. That's the kind of practice we run.",
     },
   ]
+
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
   return (
     <section className="py-20 md:py-28 bg-foreground overflow-hidden relative">
@@ -767,7 +769,10 @@ function ValuesSection() {
         >
           <div className="flex items-center gap-3 mb-5">
             <div className="h-px w-8" style={{ backgroundColor: 'rgba(255,255,255,0.3)' }} />
-            <span className="text-xs uppercase tracking-[0.22em] font-semibold" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <span
+              className="text-xs uppercase tracking-[0.22em] font-semibold"
+              style={{ color: 'rgba(255,255,255,0.4)' }}
+            >
               Our Values
             </span>
           </div>
@@ -784,57 +789,87 @@ function ValuesSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {values.map((v, i) => (
-            <motion.div
-              key={v.number}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="group p-7 md:p-8 rounded-2xl relative overflow-hidden"
-              style={{ backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              {/* Hover fill */}
-              <motion.div
-                className="absolute inset-0 rounded-2xl"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
-              />
+          {values.map((v, i) => {
+            const isHovered = hoveredIdx === i
 
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-5">
-                  <span
-                    className="font-black"
+            return (
+              <motion.div
+                key={v.number}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                onHoverStart={() => setHoveredIdx(i)}
+                onHoverEnd={() => setHoveredIdx(null)}
+                className="relative p-7 md:p-8 rounded-2xl overflow-hidden cursor-default"
+                style={{
+                  backgroundColor: isHovered
+                    ? 'rgba(255,255,255,0.09)'
+                    : 'rgba(255,255,255,0.04)',
+                  border: isHovered
+                    ? '1px solid rgba(255,255,255,0.18)'
+                    : '1px solid rgba(255,255,255,0.08)',
+                  transition: 'background-color 0.3s ease, border-color 0.3s ease',
+                }}
+              >
+                {/* Number watermark — brightens on hover */}
+                <span
+                  className="absolute top-4 right-5 font-black select-none pointer-events-none"
+                  style={{
+                    fontSize: '52px',
+                    fontFamily: 'Poppins, sans-serif',
+                    lineHeight: 1,
+                    color: 'var(--background)',
+                    opacity: isHovered ? 0.12 : 0.05,
+                    transition: 'opacity 0.3s ease',
+                  }}
+                >
+                  {v.number}
+                </span>
+
+                {/* Animated left accent bar */}
+                <motion.div
+                  className="absolute left-0 top-6 bottom-6 w-0.5 rounded-full"
+                  style={{ backgroundColor: 'var(--background)' }}
+                  animate={{ opacity: isHovered ? 0.5 : 0, scaleY: isHovered ? 1 : 0.4 }}
+                  transition={{ duration: 0.3 }}
+                />
+
+                <div className="relative z-10 pl-3">
+                  {/* Title — fully bright white always, slightly brighter on hover */}
+                  <h3
+                    className="font-bold mb-3"
                     style={{
-                      fontSize: '48px',
+                      fontSize: '18px',
                       fontFamily: 'Poppins, sans-serif',
-                      color: 'rgba(255,255,255,0.06)',
-                      lineHeight: 1,
+                      color: 'var(--background)',
+                      opacity: isHovered ? 1 : 0.85,
+                      transition: 'opacity 0.3s ease',
                     }}
                   >
-                    {v.number}
-                  </span>
+                    {v.title}
+                  </h3>
+
+                  {/* Body — dim by default, clearly visible on hover */}
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{
+                      color: 'var(--background)',
+                      opacity: isHovered ? 0.7 : 0.35,
+                      transition: 'opacity 0.3s ease',
+                    }}
+                  >
+                    {v.body}
+                  </p>
                 </div>
-                <h3
-                  className="font-bold mb-3"
-                  style={{ fontSize: '18px', fontFamily: 'Poppins, sans-serif', color: 'var(--background)' }}
-                >
-                  {v.title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {v.body}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            )
+          })}
         </div>
       </div>
     </section>
   )
 }
-
 // ─────────────────────────────────────────────
 // SECTION 7 — OFFICE / PRESENCE
 // ─────────────────────────────────────────────
