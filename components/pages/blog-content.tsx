@@ -650,68 +650,128 @@ function NewsletterSection() {
   }
 
   return (
-    <section ref={ref} className="py-16 md:py-20 bg-foreground border-t border-border overflow-hidden relative">
-      <div className="absolute inset-0 pointer-events-none"
+    <section
+      ref={ref}
+      className="py-16 md:py-20 border-t border-border overflow-hidden relative"
+      style={{ backgroundColor: 'var(--foreground)' }}
+    >
+      {/* Grid overlay — uses --background so it adapts in both themes */}
+      <div
+        className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `linear-gradient(var(--background) 1px, transparent 1px), linear-gradient(90deg, var(--background) 1px, transparent 1px)`,
-          backgroundSize: '48px 48px', opacity: 0.03,
-        }} />
+          backgroundSize: '48px 48px',
+          opacity: 0.04,
+        }}
+      />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[50%_50%] gap-10 lg:gap-20 items-center">
 
-          <motion.div initial={{ opacity: 0, x: -30 }}
+          {/* LEFT — heading + bullet points */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.7 }}>
+            transition={{ duration: 0.7 }}
+          >
+            {/* Eyebrow */}
             <div className="flex items-center gap-3 mb-5">
-              <div className="h-px w-8" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
-              <span className="text-xs uppercase tracking-[0.22em] font-semibold" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <div className="h-px w-8" style={{ backgroundColor: 'var(--background)', opacity: 0.3 }} />
+              <span
+                className="text-xs uppercase tracking-[0.22em] font-semibold"
+                style={{ color: 'var(--background)', opacity: 0.5 }}
+              >
                 Newsletter
               </span>
             </div>
-            <h2 className="font-bold leading-tight mb-4"
-              style={{ fontSize: 'clamp(26px, 4vw, 48px)', fontFamily: 'Poppins, sans-serif', color: 'var(--background)' }}>
+
+            {/* Heading */}
+            <h2
+              className="font-bold leading-tight mb-4"
+              style={{
+                fontSize: 'clamp(26px, 4vw, 48px)',
+                fontFamily: 'Poppins, sans-serif',
+                color: 'var(--background)',
+              }}
+            >
               Tax changes don't<br />wait. Neither should you.
             </h2>
-            <p className="text-sm md:text-base leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+
+            {/* Subtext */}
+            <p
+              className="text-sm md:text-base leading-relaxed"
+              style={{ color: 'var(--background)', opacity: 0.55 }}
+            >
               Get our weekly digest of compliance deadlines, regulatory updates, and practical advisory — written by practising CAs, not content marketers.
             </p>
 
-            {/* What you get */}
+            {/* Bullet list */}
             <div className="mt-7 flex flex-col gap-3">
               {[
                 'Deadline calendar every Monday morning',
                 'Analysis of CBDT and CBIC notifications',
                 'One practical tip from our partners per week',
               ].map((item, i) => (
-                <motion.div key={i}
+                <motion.div
+                  key={i}
                   initial={{ opacity: 0, x: -15 }}
                   animate={inView ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
-                  className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.3)' }} />
-                  <span className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>{item}</span>
+                  className="flex items-start gap-3"
+                >
+                  <div
+                    className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
+                    style={{ backgroundColor: 'var(--background)', opacity: 0.4 }}
+                  />
+                  <span
+                    className="text-sm"
+                    style={{ color: 'var(--background)', opacity: 0.55 }}
+                  >
+                    {item}
+                  </span>
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 30 }}
+          {/* RIGHT — form card */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.15 }}
             className="p-7 md:p-9 rounded-2xl"
-            style={{ backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-
+            style={{
+              backgroundColor: 'var(--background)',
+              border: '1px solid var(--border)',
+              opacity: 1,
+            }}
+          >
             <AnimatePresence mode="wait">
               {!submitted ? (
-                <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <p className="font-semibold mb-1" style={{ color: 'var(--background)', fontFamily: 'Poppins, sans-serif', fontSize: '18px' }}>
+                <motion.div
+                  key="form"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {/* Form heading — now uses --foreground so readable in both themes */}
+                  <p
+                    className="font-semibold mb-1"
+                    style={{
+                      color: 'var(--foreground)',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: '18px',
+                    }}
+                  >
                     Subscribe — it's free
                   </p>
-                  <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  <p
+                    className="text-sm mb-6"
+                    style={{ color: 'var(--muted-foreground)' }}
+                  >
                     Join 1,200+ business owners who read our weekly digest.
                   </p>
+
                   <form onSubmit={handleSubmit} className="flex flex-col gap-3">
                     <input
                       type="email"
@@ -721,52 +781,78 @@ function NewsletterSection() {
                       required
                       className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
                       style={{
-                        backgroundColor: 'rgba(255,255,255,0.07)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        color: 'var(--background)',
+                        backgroundColor: 'var(--input)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--foreground)',
                         fontFamily: 'Poppins, sans-serif',
                       }}
                     />
                     <input
                       type="text"
                       placeholder="Your name (optional)"
-                      className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+                      className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
                       style={{
-                        backgroundColor: 'rgba(255,255,255,0.07)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        color: 'var(--background)',
+                        backgroundColor: 'var(--input)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--foreground)',
                         fontFamily: 'Poppins, sans-serif',
                       }}
                     />
-                    <button type="submit"
+                    <button
+                      type="submit"
                       className="w-full py-3 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
-                      style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+                      style={{
+                        backgroundColor: 'var(--foreground)',
+                        color: 'var(--background)',
+                        fontFamily: 'Poppins, sans-serif',
+                      }}
+                    >
                       Subscribe to Weekly Digest →
                     </button>
                   </form>
-                  <p className="text-xs mt-4 text-center" style={{ color: 'rgba(255,255,255,0.2)' }}>
+
+                  <p
+                    className="text-xs mt-4 text-center"
+                    style={{ color: 'var(--muted-foreground)' }}
+                  >
                     No spam. Unsubscribe at any time.
                   </p>
                 </motion.div>
               ) : (
-                <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-8">
-                  <div className="w-14 h-14 rounded-full border-2 flex items-center justify-center mx-auto mb-5"
-                    style={{ borderColor: 'rgba(255,255,255,0.2)' }}>
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-8"
+                >
+                  <div
+                    className="w-14 h-14 rounded-full border-2 flex items-center justify-center mx-auto mb-5"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
                     <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-                      <path d="M5 13l4 4L19 7" stroke="var(--background)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path
+                        d="M5 13l4 4L19 7"
+                        stroke="var(--foreground)"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </div>
-                  <p className="font-bold text-lg mb-2" style={{ color: 'var(--background)', fontFamily: 'Poppins, sans-serif' }}>
+                  <p
+                    className="font-bold text-lg mb-2"
+                    style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}
+                  >
                     You're in.
                   </p>
-                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
                     First digest lands in your inbox this Monday.
                   </p>
                 </motion.div>
               )}
             </AnimatePresence>
           </motion.div>
+
         </div>
       </div>
     </section>
