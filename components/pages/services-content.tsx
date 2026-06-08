@@ -730,10 +730,14 @@ function ServicesPageCTA() {
     { label: 'Response time', value: '< 24h', sub: 'on every query' },
     { label: 'Compliance rate', value: '100%', sub: 'on-time filings' },
   ]
- 
+
   return (
-    <section className="bg-foreground py-16 md:py-20 overflow-hidden relative">
-      {/* Faint grid on dark bg */}
+    <section
+      className="py-16 md:py-20 overflow-hidden relative"
+      // bg-foreground = dark in light mode, light in dark mode — always inverted
+      style={{ backgroundColor: 'var(--foreground)' }}
+    >
+      {/* Grid pattern — uses var(--background) so it always contrasts the section bg */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -742,19 +746,25 @@ function ServicesPageCTA() {
             linear-gradient(90deg, var(--background) 1px, transparent 1px)
           `,
           backgroundSize: '48px 48px',
-          opacity: 0.04,
+          opacity: 0.06,
         }}
       />
- 
+
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left */}
+
+          {/* ── LEFT ── */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.65 }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           >
+            {/*
+              All text uses var(--background).
+              In light mode: --background = #ffffff  → white text on dark section  ✓
+              In dark mode:  --background = #0d0d0d  → dark text on light section  ✓
+            */}
             <h2
               className="font-bold leading-tight mb-5"
               style={{
@@ -765,36 +775,89 @@ function ServicesPageCTA() {
             >
               Not sure which service<br />you need? Let us assess.
             </h2>
-            <p className="text-sm md:text-base leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              Book a 30-minute diagnostic call. We'll review your current compliance setup, identify gaps, and recommend exactly which services apply — at no charge.
+
+            {/* Body: var(--background) at 75% opacity — readable in both themes */}
+            <p
+              className="text-sm md:text-base leading-relaxed mb-8"
+              style={{
+                color: 'var(--background)',
+                opacity: 0.75,
+              }}
+            >
+              Book a 30-minute diagnostic call. We'll review your current compliance setup,
+              identify gaps, and recommend exactly which services apply — at no charge.
             </p>
+
             <div className="flex flex-wrap gap-3">
-              <Link
+              {/*
+                Primary button:
+                  bg = var(--background)  → white in light / dark in dark
+                  text = var(--foreground) → dark in light / light in dark
+                Always readable, always contrasted.
+                Hover: use CSS transition only (no Framer animate on bg/color)
+                to avoid the Framer inline-style glitch on color properties.
+              */}
+              <a
                 href="/contact"
-                className="px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
-                style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
+                className="inline-block px-6 py-3 rounded-xl text-sm font-semibold"
+                style={{
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--foreground)',
+                  fontFamily: 'Poppins, sans-serif',
+                  transition: 'opacity 0.2s ease, transform 0.2s ease',
+                }}
+                onMouseEnter={e => {
+                  ;(e.currentTarget as HTMLElement).style.opacity = '0.88'
+                  ;(e.currentTarget as HTMLElement).style.transform = 'scale(1.02)'
+                }}
+                onMouseLeave={e => {
+                  ;(e.currentTarget as HTMLElement).style.opacity = '1'
+                  ;(e.currentTarget as HTMLElement).style.transform = 'scale(1)'
+                }}
               >
                 Book Free Diagnostic
-              </Link>
+              </a>
+
+              {/*
+                Secondary button (ghost):
+                  border + text = var(--background) at partial opacity
+                  Hover: bg becomes var(--background) at ~12% opacity
+                CSS transition handles this cleanly without Framer glitch.
+              */}
               <a
                 href="mailto:hello@cafirm.in"
-                className="px-6 py-3 rounded-xl text-sm font-semibold border transition-all"
+                className="inline-block px-6 py-3 rounded-xl text-sm font-semibold"
                 style={{
-                  borderColor: 'rgba(255,255,255,0.2)',
+                  border: '1px solid var(--background)',
+                  borderColor: 'color-mix(in srgb, var(--background) 45%, transparent)',
                   color: 'var(--background)',
+                  fontFamily: 'Poppins, sans-serif',
+                  transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
+                }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.backgroundColor = 'color-mix(in srgb, var(--background) 12%, transparent)'
+                  el.style.borderColor = 'color-mix(in srgb, var(--background) 70%, transparent)'
+                  el.style.transform = 'scale(1.02)'
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.backgroundColor = 'transparent'
+                  el.style.borderColor = 'color-mix(in srgb, var(--background) 45%, transparent)'
+                  el.style.transform = 'scale(1)'
                 }}
               >
                 Email Us →
               </a>
             </div>
           </motion.div>
- 
-          {/* Right: stat cards */}
+
+          {/* ── RIGHT: stat cards ── */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.65, delay: 0.15 }}
+            transition={{ duration: 0.65, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3 gap-4"
           >
             {engagements.map((e, i) => (
@@ -803,21 +866,71 @@ function ServicesPageCTA() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.25 + i * 0.1 }}
-                className="rounded-xl p-5 flex flex-col gap-1"
-                style={{ backgroundColor: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+                transition={{ duration: 0.5, delay: 0.25 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="rounded-xl p-5 flex flex-col gap-2"
+                /*
+                  Card bg/border use var(--background) at low opacity so they
+                  always read as a subtle frosted-glass panel on the inverted bg.
+                  CSS transition handles hover — no Framer animate on colors
+                  to avoid the interpolation glitch.
+                */
+                style={{
+                  backgroundColor: 'color-mix(in srgb, var(--background) 7%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--background) 14%, transparent)',
+                  transition: 'background-color 0.22s ease, border-color 0.22s ease, transform 0.22s ease',
+                  cursor: 'default',
+                }}
+                onMouseEnter={e => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.backgroundColor = 'color-mix(in srgb, var(--background) 13%, transparent)'
+                  el.style.borderColor = 'color-mix(in srgb, var(--background) 28%, transparent)'
+                  el.style.transform = 'translateY(-3px)'
+                }}
+                onMouseLeave={e => {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.backgroundColor = 'color-mix(in srgb, var(--background) 7%, transparent)'
+                  el.style.borderColor = 'color-mix(in srgb, var(--background) 14%, transparent)'
+                  el.style.transform = 'translateY(0px)'
+                }}
               >
-                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>{e.label}</span>
+                {/* Label — var(--background) at 65% */}
+                <span
+                  className="text-xs uppercase tracking-widest font-semibold"
+                  style={{
+                    color: 'var(--background)',
+                    opacity: 0.65,
+                  }}
+                >
+                  {e.label}
+                </span>
+
+                {/* Value — full var(--background), always max contrast */}
                 <span
                   className="font-bold"
-                  style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontFamily: 'Poppins, sans-serif', color: 'var(--background)', lineHeight: 1.1 }}
+                  style={{
+                    fontSize: 'clamp(26px, 3vw, 38px)',
+                    fontFamily: 'Poppins, sans-serif',
+                    color: 'var(--background)',
+                    lineHeight: 1.1,
+                  }}
                 >
                   {e.value}
                 </span>
-                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{e.sub}</span>
+
+                {/* Sub — var(--background) at 60% */}
+                <span
+                  className="text-xs"
+                  style={{
+                    color: 'var(--background)',
+                    opacity: 0.60,
+                  }}
+                >
+                  {e.sub}
+                </span>
               </motion.div>
             ))}
           </motion.div>
+
         </div>
       </div>
     </section>
