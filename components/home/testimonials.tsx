@@ -33,7 +33,7 @@ const testimonials = [
     initials: 'AS',
     company: 'Fintech startup · Series A',
     content: 'From our Startup India registration to our Series A due diligence, they have been a constant partner. The depth of knowledge across corporate law and taxation is genuinely unmatched for a firm of this size.',
-    detail: 'Our investor's legal team flagged zero compliance issues during due diligence. That says everything.',
+    detail: 'Our investor\'s legal team flagged zero compliance issues during due diligence. That says everything.',
     service: 'Startup Advisory · Company Law · Tax',
     rating: 5,
   },
