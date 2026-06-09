@@ -761,7 +761,7 @@ function ContactBottomCTA() {
             </a>
             <a href="mailto:info@eliteca.in"
               className="px-8 py-4 rounded-xl text-sm font-semibold border transition-all"
-              style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'var(--background)', fontFamily: 'Poppins, sans-serif' }}>
+              style={{ borderColor: 'var(--background)', color: 'var(--background)', fontFamily: 'Poppins, sans-serif' }}>
               Email Us →
             </a>
           </div>
