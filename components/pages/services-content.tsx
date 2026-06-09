@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useInView } from 'framer-motion'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
@@ -128,242 +128,443 @@ function ServiceSVG({ serviceId }: { serviceId: number }) {
   return <svg dangerouslySetInnerHTML={{ __html: svgContent[serviceId] || '' }} style={{ width: '100%', height: '100%' }} />
 }
 
+// ─────────────────────────────────────────────
+// SERVICE CARD
+// ─────────────────────────────────────────────
 function ServiceCard({ service, onClick }: { service: typeof allServices[0]; onClick: () => void }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-60px' })
+  const [hovered, setHovered] = useState(false)
+
   return (
-    <motion.button
+    <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
       onClick={onClick}
-      className="group relative rounded-2xl overflow-hidden cursor-pointer border border-border bg-card h-64 md:h-72 flex flex-col hover:border-foreground"
-      whileHover={{ scale: 1.03 }}
-      style={{ x: 0 }}
+      className="group relative rounded-2xl overflow-hidden cursor-pointer border flex flex-col h-64 md:h-72"
+      style={{
+        borderColor: hovered ? 'var(--foreground)' : 'var(--border)',
+        backgroundColor: hovered ? 'var(--card)' : 'var(--background)',
+        transition: 'border-color 0.22s ease, background-color 0.22s ease',
+      }}
     >
-      {/* Image Area (55%) */}
-      <motion.div
-        className="relative w-full h-[55%] overflow-hidden rounded-t-2xl filter transition-all duration-300 group-hover:brightness-[1.15]"
+      {/* ── SVG IMAGE AREA (55%) ── */}
+      <div
+        className="relative w-full h-[55%] overflow-hidden rounded-t-2xl flex-shrink-0"
         style={{ backgroundColor: 'var(--muted)' }}
       >
-        <ServiceSVG serviceId={service.id} />
+        {/* Brightness on hover via wrapper */}
+        <motion.div
+          className="w-full h-full"
+          animate={{ filter: hovered ? 'brightness(1.12)' : 'brightness(1)' }}
+          transition={{ duration: 0.3 }}
+        >
+          <ServiceSVG serviceId={service.id} />
+        </motion.div>
+
+        {/* Shimmer sweep on hover */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
-          initial={{ x: '-100%' }}
-          whileHover={{ x: '100%' }}
-          transition={{ duration: 0.6, ease: 'linear' }}
+          initial={{ x: '-110%' }}
+          animate={{ x: hovered ? '110%' : '-110%' }}
+          transition={{ duration: 0.55, ease: 'easeInOut' }}
           style={{
-            background: 'linear-gradient(90deg, transparent, var(--foreground) 15%, transparent)',
-            opacity: 0.15
+            background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--foreground) 8%, transparent), transparent)',
           }}
         />
-      </motion.div>
 
-      {/* Text Area (45%) */}
-      <div className="p-3 md:p-4 flex flex-col justify-between h-[45%]">
-        <div>
-          <h3 className="font-semibold text-sm md:text-base text-foreground line-clamp-2 mb-2">{service.title}</h3>
-          <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">{service.description}</p>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{service.category}</span>
-          <motion.span animate={{ x: [0, 2, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-xs text-muted-foreground">→</motion.span>
+        {/* Category badge — top left */}
+        <div
+          className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-xs font-semibold"
+          style={{
+            backgroundColor: 'var(--background)',
+            color: 'var(--muted-foreground)',
+            border: '1px solid var(--border)',
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: '10px',
+          }}
+        >
+          {service.category}
         </div>
       </div>
-    </motion.button>
+
+      {/* ── TEXT AREA (45%) ── */}
+      <div className="p-3.5 md:p-4 flex flex-col justify-between flex-1 min-h-0">
+        <div className="flex flex-col gap-1.5 min-h-0">
+          <h3
+            className="font-semibold text-foreground line-clamp-1 text-sm md:text-base leading-tight"
+            style={{ fontFamily: 'Poppins, sans-serif' }}
+          >
+            {service.title}
+          </h3>
+          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+            {service.description}
+          </p>
+        </div>
+
+        {/* Bottom row */}
+        <div className="flex items-center justify-between mt-2">
+          {/* Subservice count pill */}
+          <span
+            className="text-xs text-muted-foreground"
+            style={{ fontSize: '10px' }}
+          >
+            {/* dynamically show subservice count if available */}
+            {(mainServiceDescriptions[service.id]?.subDescriptions?.length ?? service.subServices?.length ?? 0)} services
+          </span>
+
+          {/* Arrow that slides right on hover */}
+          <motion.span
+            animate={{ x: hovered ? 4 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-xs font-semibold"
+            style={{ color: hovered ? 'var(--foreground)' : 'var(--muted-foreground)' }}
+          >
+            Explore →
+          </motion.span>
+        </div>
+      </div>
+
+      {/* Bottom border sweep on hover */}
+      <motion.div
+        className="absolute bottom-0 left-0 h-[2px]"
+        style={{ backgroundColor: 'var(--foreground)' }}
+        animate={{ width: hovered ? '100%' : '0%' }}
+        transition={{ duration: 0.32 }}
+      />
+    </motion.div>
   )
 }
 
+// ─────────────────────────────────────────────
+// DETAIL PANEL
+// ─────────────────────────────────────────────
 function DetailPanel({ service, onNext, onPrev, currentIndex, totalServices, onClose }: any) {
   const [expandedSubIndex, setExpandedSubIndex] = useState<number | null>(null)
-  
   const serviceData = mainServiceDescriptions[service.id] || { main: service.description, subDescriptions: service.subServices }
 
   const handleSubServiceClick = (idx: number) => {
     setExpandedSubIndex(expandedSubIndex === idx ? null : idx)
   }
 
-  const handleSkip = () => {
-    // No animation to skip
-  }
-
   useEffect(() => {
-    return () => {
-      setExpandedSubIndex(null)
-    }
+    setExpandedSubIndex(null)
   }, [service.id])
 
-  // Progress is always 100 (no animation)
-  const progress = 100
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       onClick={onClose}
-      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'color-mix(in srgb, var(--foreground) 30%, transparent)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
     >
       <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        className="bg-background border border-border rounded-lg w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col"
+        initial={{ scale: 0.94, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.94, opacity: 0, y: 20 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        onClick={e => e.stopPropagation()}
+        className="w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl border border-border overflow-hidden"
+        style={{ backgroundColor: 'var(--background)' }}
       >
-        {/* Progress Bar */}
-        <div className="h-0.5 bg-border overflow-hidden">
+        {/* ── PROGRESS BAR (full width, always filled) ── */}
+        <div className="h-[2px] bg-border overflow-hidden flex-shrink-0">
           <motion.div
             className="h-full bg-foreground"
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.3 }}
+            initial={{ width: 0 }}
+            animate={{ width: '100%' }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
           />
         </div>
 
-        {/* Header */}
-        <div className="border-b border-border px-6 md:px-8 py-4 md:py-6 flex justify-between items-start">
+        {/* ── HEADER ── */}
+        <div className="border-b border-border px-6 md:px-8 py-4 md:py-5 flex items-center justify-between gap-4 flex-shrink-0">
           <motion.div
-            initial={{ x: 30, opacity: 0 }}
+            initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 100, damping: 18 }}
+            transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+            className="flex items-center gap-3 min-w-0"
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground font-poppins">{service.title}</h2>
-            <div className="flex items-center gap-2 mt-2">
-              <p className="text-xs md:text-sm text-muted-foreground">{service.category}</p>
-              <div className="w-px h-4 bg-border" />
-              <p className="text-xs text-muted-foreground">{serviceData.subDescriptions.length} services included</p>
+            {/* Service number badge */}
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
+              style={{ backgroundColor: 'var(--foreground)', color: 'var(--background)', fontFamily: 'Poppins, sans-serif' }}
+            >
+              {String(currentIndex + 1).padStart(2, '0')}
+            </div>
+            <div className="min-w-0">
+              <h2
+                className="text-xl md:text-2xl font-bold text-foreground leading-tight truncate"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              >
+                {service.title}
+              </h2>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-xs text-muted-foreground">{service.category}</span>
+                <span className="w-px h-3 bg-border" />
+                <span className="text-xs text-muted-foreground">
+                  {serviceData.subDescriptions.length} sub-services
+                </span>
+              </div>
             </div>
           </motion.div>
-          <button onClick={onClose} className="p-2 hover:bg-foreground/5 rounded transition-colors flex-shrink-0">
-            <X size={20} className="text-foreground/60" />
+
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border border-border transition-all duration-150"
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--muted)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--foreground)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)' }}
+          >
+            <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5">
+              <path d="M3 3l10 10M13 3L3 13" stroke="var(--foreground)" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-[40%_60%]">
-          {/* Left Panel - Image */}
+        {/* ── CONTENT GRID ── */}
+        <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-[40%_60%] min-h-0">
+
+          {/* LEFT — SVG illustration */}
           <motion.div
-            initial={{ x: -40, opacity: 0 }}
+            initial={{ x: -30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 90, damping: 20, duration: 0.5 }}
-            className="hidden md:flex items-center justify-center min-h-96 rounded-l-2xl overflow-hidden"
-            style={{ backgroundColor: 'var(--muted)' }}
+            transition={{ type: 'spring', stiffness: 90, damping: 22 }}
+            className="hidden md:flex items-center justify-center overflow-hidden relative"
+            style={{ backgroundColor: 'var(--muted)', borderRight: '1px solid var(--border)' }}
           >
+            {/* Floating animation */}
             <motion.div
-              animate={{ y: [0, -6, 0] }}
+              animate={{ y: [0, -8, 0] }}
               transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
               className="w-full h-full flex items-center justify-center"
             >
               <ServiceSVG serviceId={service.id} />
             </motion.div>
+
+            {/* Service number watermark */}
+            <div
+              className="absolute bottom-4 right-5 font-black text-foreground pointer-events-none select-none"
+              style={{ fontSize: '80px', fontFamily: 'Poppins, sans-serif', opacity: 0.04, lineHeight: 1 }}
+            >
+              {String(currentIndex + 1).padStart(2, '0')}
+            </div>
           </motion.div>
 
-          {/* Right Panel - Content */}
+          {/* RIGHT — scrollable content */}
           <div
-            className="overflow-y-auto px-6 md:px-8 py-6 space-y-6 md:space-y-8"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="overflow-y-auto"
+            style={{ scrollbarWidth: 'none' }}
           >
-            <style>{`
-              div::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
+            <div className="px-6 md:px-8 py-6 space-y-7">
 
-            {/* OVERVIEW Section - Fade in with slide up */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-            >
-              <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">Overview</p>
-              <p className="text-sm md:text-base text-foreground/80 leading-relaxed font-sans">
-                {serviceData.main}
-              </p>
-            </motion.div>
-
-            {/* Services Breakdown - Staggered entrance */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <p className="text-xs md:text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-4">
-                Services Included ({serviceData.subDescriptions.length})
-              </p>
-              
-              <div className="space-y-2 mb-8">
-                {serviceData.subDescriptions.map((desc, idx) => (
-                  <motion.button
-                    key={idx}
-                    onClick={() => handleSubServiceClick(idx)}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.25 + idx * 0.1, ease: 'easeOut' }}
-                    className="w-full group relative flex items-start gap-3 p-3 rounded-lg transition-all cursor-pointer hover:bg-card"
-                    style={{
-                      backgroundColor: expandedSubIndex === idx ? 'var(--card)' : 'transparent',
-                      border: expandedSubIndex === idx ? '1px solid var(--border)' : '1px solid var(--border)',
-                    }}
-                  >
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-foreground/10 text-foreground flex items-center justify-center text-xs font-semibold">
-                      {idx + 1}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="text-sm font-semibold text-foreground">{service.subServices[idx]}</p>
-                      <AnimatePresence>
-                        {expandedSubIndex === idx && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3, ease: 'easeInOut' }}
-                            className="overflow-hidden mt-2"
-                          >
-                            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pl-8 border-l border-border font-sans">
-                              {desc}
-                            </p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                    <motion.div
-                      animate={{ rotate: expandedSubIndex === idx ? 45 : 0 }}
-                      transition={{ duration: 0.25 }}
-                      className="flex-shrink-0 text-muted-foreground group-hover:text-foreground"
-                    >
-                      +
-                    </motion.div>
-                  </motion.button>
-                ))}
-              </div>
-
-              {/* CTA Button - Fade in with scale */}
+              {/* OVERVIEW */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 + serviceData.subDescriptions.length * 0.1, ease: 'easeOut' }}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
               >
-                <Link
-                  href="/contact"
-                  className="inline-block px-6 py-3 bg-foreground text-background rounded-lg text-sm font-semibold hover:bg-foreground/90 transition-all hover:shadow-lg"
-                >
-                  Get This Service
-                </Link>
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground font-semibold mb-3">
+                  Overview
+                </p>
+                <p className="text-sm md:text-base text-foreground leading-relaxed"
+                  style={{ opacity: 0.82 }}>
+                  {serviceData.main}
+                </p>
               </motion.div>
-            </motion.div>
+
+              {/* DIVIDER */}
+              <motion.div
+                className="h-px bg-border"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
+                style={{ transformOrigin: 'left' }}
+              />
+
+              {/* SERVICES INCLUDED */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground font-semibold mb-4">
+                  Services Included ({serviceData.subDescriptions.length})
+                </p>
+
+                <div className="space-y-2">
+                  {serviceData.subDescriptions.map((desc: string, idx: number) => (
+                    <motion.button
+                      key={idx}
+                      onClick={() => handleSubServiceClick(idx)}
+                      initial={{ opacity: 0, x: -16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.35, delay: 0.25 + idx * 0.07, ease: 'easeOut' }}
+                      className="w-full flex items-start gap-3 p-3 rounded-xl border text-left group transition-colors duration-150"
+                      style={{
+                        borderColor: expandedSubIndex === idx ? 'var(--foreground)' : 'var(--border)',
+                        backgroundColor: expandedSubIndex === idx ? 'var(--card)' : 'transparent',
+                      }}
+                      onMouseEnter={e => {
+                        if (expandedSubIndex !== idx)
+                          (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--card)'
+                      }}
+                      onMouseLeave={e => {
+                        if (expandedSubIndex !== idx)
+                          (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'
+                      }}
+                    >
+                      {/* Number badge */}
+                      <div
+                        className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-150"
+                        style={{
+                          backgroundColor: expandedSubIndex === idx ? 'var(--foreground)' : 'var(--muted)',
+                          color: expandedSubIndex === idx ? 'var(--background)' : 'var(--muted-foreground)',
+                          fontFamily: 'Poppins, sans-serif',
+                        }}
+                      >
+                        {idx + 1}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground"
+                          style={{ fontFamily: 'Poppins, sans-serif' }}>
+                          {service.subServices[idx]}
+                        </p>
+
+                        <AnimatePresence>
+                          {expandedSubIndex === idx && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.28, ease: 'easeInOut' }}
+                              className="overflow-hidden"
+                            >
+                              <p className="text-xs md:text-sm text-muted-foreground leading-relaxed mt-2 pl-0 border-l-2 border-border pl-3">
+                                {desc}
+                              </p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+
+                      {/* Plus / cross toggle */}
+                      <motion.div
+                        animate={{ rotate: expandedSubIndex === idx ? 45 : 0 }}
+                        transition={{ duration: 0.22 }}
+                        className="flex-shrink-0 text-muted-foreground text-lg leading-none"
+                        style={{ color: expandedSubIndex === idx ? 'var(--foreground)' : 'var(--muted-foreground)' }}
+                      >
+                        +
+                      </motion.div>
+                    </motion.button>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.35 + serviceData.subDescriptions.length * 0.07 }}
+                  className="mt-7"
+                >
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:shadow-lg"
+                    style={{
+                      backgroundColor: 'var(--foreground)',
+                      color: 'var(--background)',
+                      fontFamily: 'Poppins, sans-serif',
+                      transition: 'opacity 0.2s ease, transform 0.2s ease',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '0.88'; (e.currentTarget as HTMLElement).style.transform = 'scale(1.02)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; (e.currentTarget as HTMLElement).style.transform = 'scale(1)' }}
+                  >
+                    Get This Service
+                    <motion.span
+                      animate={{ x: [0, 3, 0] }}
+                      transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                    >
+                      →
+                    </motion.span>
+                  </Link>
+                </motion.div>
+              </motion.div>
+
+            </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-border px-6 md:px-8 py-3 md:py-4 flex justify-between items-center gap-4 flex-wrap text-sm">
-          <span className="text-xs text-foreground/50">{currentIndex + 1} of {totalServices}</span>
-          <div className="flex gap-2">
-            <button onClick={onPrev} className="p-2 hover:bg-foreground/5 rounded transition-colors">
-              <ChevronLeft size={18} className="text-foreground/60" />
+        {/* ── FOOTER ── */}
+        <div
+          className="border-t border-border px-6 md:px-8 py-3 flex items-center justify-between gap-4 flex-shrink-0"
+          style={{ backgroundColor: 'var(--card)' }}
+        >
+          {/* Pagination text */}
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {currentIndex + 1} / {totalServices}
+            </span>
+            {/* Dot progress */}
+            <div className="hidden sm:flex items-center gap-1.5">
+              {Array.from({ length: Math.min(totalServices, 8) }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-full transition-all duration-200"
+                  style={{
+                    width: i === currentIndex % 8 ? '16px' : '5px',
+                    height: '5px',
+                    backgroundColor: i === currentIndex % 8 ? 'var(--foreground)' : 'var(--border)',
+                  }}
+                />
+              ))}
+              {totalServices > 8 && (
+                <span className="text-xs text-muted-foreground ml-1">+{totalServices - 8}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Nav buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onPrev}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs text-muted-foreground transition-all duration-150"
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--foreground)'; (e.currentTarget as HTMLElement).style.color = 'var(--foreground)'; (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--muted)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--muted-foreground)'; (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
+            >
+              <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5">
+                <path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Prev
             </button>
-            <button onClick={onNext} className="p-2 hover:bg-foreground/5 rounded transition-colors">
-              <ChevronRight size={18} className="text-foreground/60" />
+            <button
+              onClick={onNext}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs text-muted-foreground transition-all duration-150"
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--foreground)'; (e.currentTarget as HTMLElement).style.color = 'var(--foreground)'; (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--muted)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--muted-foreground)'; (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
+            >
+              Next
+              <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5">
+                <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </button>
           </div>
         </div>
+
       </motion.div>
     </motion.div>
   )
