@@ -750,7 +750,7 @@ function ContactBottomCTA() {
             style={{ fontSize: 'clamp(26px, 4.5vw, 56px)', fontFamily: 'Poppins, sans-serif', color: 'var(--background)' }}>
             Prefer a call over a form?
           </h2>
-          <p className="text-sm md:text-base mb-9 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+          <p className="text-sm md:text-base mb-9 leading-relaxed" style={{ color: 'var(--background)' }}>
             Call our Ahmedabad office directly and ask to speak with the CA on duty. No appointment needed for a 10-minute conversation.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -767,8 +767,8 @@ function ContactBottomCTA() {
           </div>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
             {['ICAI Member Firm', 'RBI Empanelled', 'ISO Certified', 'Est. 2010'].map(b => (
-              <div key={b} className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
+              <div key={b} className="flex items-center gap-2 text-xs" style={{ color: 'var(--background)' }}>
+                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--background)' }} />
                 {b}
               </div>
             ))}
