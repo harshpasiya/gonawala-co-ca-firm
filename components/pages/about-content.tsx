@@ -768,10 +768,10 @@ function ValuesSection() {
           className="mb-14"
         >
           <div className="flex items-center gap-3 mb-5">
-            <div className="h-px w-8" style={{ backgroundColor: 'rgba(255,255,255,0.3)' }} />
+            <div className="h-px w-8" style={{ backgroundColor: 'var(--background)' }} />
             <span
               className="text-xs uppercase tracking-[0.22em] font-semibold"
-              style={{ color: 'rgba(255,255,255,0.4)' }}
+              style={{ color: 'var(--background)' }}
             >
               Our Values
             </span>
@@ -802,15 +802,15 @@ function ValuesSection() {
                 onHoverStart={() => setHoveredIdx(i)}
                 onHoverEnd={() => setHoveredIdx(null)}
                 className="relative p-7 md:p-8 rounded-2xl overflow-hidden cursor-default"
-                style={{
-                  backgroundColor: isHovered
-                    ? 'rgba(255,255,255,0.09)'
-                    : 'rgba(255,255,255,0.04)',
-                  border: isHovered
-                    ? '1px solid rgba(255,255,255,0.18)'
-                    : '1px solid rgba(255,255,255,0.08)',
-                  transition: 'background-color 0.3s ease, border-color 0.3s ease',
-                }}
+                // style={{
+                //   backgroundColor: isHovered
+                //     ? 'rgba(255,255,255,0.09)'
+                //     : 'rgba(255,255,255,0.04)',
+                //   border: isHovered
+                //     ? '1px solid var(--background,0.18)'
+                //     : '1px solid rgba(255,255,255,0.08)',
+                //   transition: 'background-color 0.3s ease, border-color 0.3s ease',
+                // }}
               >
                 {/* Number watermark — brightens on hover */}
                 <span
